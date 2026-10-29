@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # ── Node.js App ───────────────────────────────────────────
+  app:
+    build: .
+    container_name: url-shortener-app
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - MONGO_URI=mongodb://mongo:27017/url-shortener
+      - PORT=3000
+      - BASE_URL=http://localhost:3000
+      - DEMO_API_KEY=demo_key_12345
+      - IP_HASH_SALT=change_this_salt
+    depends_on:
+      mongo:
+        condition: service_healthy  # Wait for MongoDB to be ready
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # ── MongoDB ───────────────────────────────────────────────
+  mongo:
+    image: mongo:7
+    container_name: url-shortener-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db  # Persist data across container restarts
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # ── Mongo Express (DB Admin UI) ───────────────────────────
+  mongo-express:
+    image: mongo-express:latest
+    container_name: url-shortener-mongo-express
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongo
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=password
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - app-network
+
+volumes:
+  mongo-data:  # Named volume persists data across docker compose down/up
+
+networks:
+  app-network:
+    driver: bridge  # Default Docker network; containers can communicate by service name

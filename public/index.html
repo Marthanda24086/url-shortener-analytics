@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LinkSnap — Smart URL Shortener with Analytics</title>
+  <meta name="description" content="Shorten URLs, track clicks, and analyze your audience with LinkSnap — the professional URL shortener with real-time analytics." />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    /* ── Navbar ─────────────────────────────────────────────── */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 1rem 0;
+      background: rgba(10, 10, 15, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--text-secondary); font-size: 0.9rem; font-weight: 500; transition: color var(--transition-fast); }
+    .nav-links a:hover { color: var(--text-primary); }
+
+    /* ── Hero ────────────────────────────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 8rem 1rem 4rem;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 1rem;
+      border-radius: var(--radius-full);
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--primary-light);
+      margin-bottom: 1.5rem;
+      animation: fadeInUp 0.5s ease;
+    }
+
+    .hero-badge .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--success);
+      animation: pulse-glow 2s infinite;
+    }
+
+    .hero-title {
+      font-size: clamp(2.5rem, 6vw, 5rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+      animation: fadeInUp 0.5s ease 0.1s both;
+    }
+
+    .hero-subtitle {
+      font-size: 1.15rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto 3rem;
+      animation: fadeInUp 0.5s ease 0.2s both;
+    }
+
+    /* ── URL Shortener Form ───────────────────────────────────── */
+    .shortener-card {
+      width: 100%;
+      max-width: 760px;
+      animation: fadeInUp 0.5s ease 0.3s both;
+    }
+
+    .shortener-form {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .shortener-form .form-input {
+      flex: 1;
+      font-size: 1rem;
+      padding: 1rem 1.25rem;
+    }
+
+    .advanced-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: var(--radius-sm);
+      transition: color var(--transition-fast);
+      width: fit-content;
+      user-select: none;
+    }
+
+    .advanced-toggle:hover { color: var(--primary-light); }
+
+    .advanced-options {
+      display: none;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .advanced-options.visible { display: grid; }
+
+    /* ── API Key Section ─────────────────────────────────────── */
+    .api-key-section {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: rgba(99, 102, 241, 0.05);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .api-key-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--primary-light);
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+    }
+
+    /* ── Result Card ─────────────────────────────────────────── */
+    #result-section { display: none; margin-top: 2rem; }
+
+    .result-card {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .short-url-display {
+      flex: 1;
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--primary-light);
+      word-break: break-all;
+    }
+
+    .result-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+    .qr-preview {
+      margin-top: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .qr-image {
+      width: 120px; height: 120px;
+      border-radius: var(--radius-md);
+      border: 2px solid var(--border);
+    }
+
+    .qr-meta { flex: 1; }
+    .qr-meta p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.25rem; }
+    .qr-meta strong { color: var(--text-primary); }
+
+    /* ── Stats Bar ────────────────────────────────────────────── */
+    .stats-bar {
+      display: flex;
+      gap: 3rem;
+      justify-content: center;
+      margin-top: 4rem;
+      padding-top: 3rem;
+      border-top: 1px solid var(--border-light);
+      animation: fadeInUp 0.5s ease 0.4s both;
+    }
+
+    .stats-bar-item { text-align: center; }
+    .stats-bar-number {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 800;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stats-bar-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+    /* ── Features ────────────────────────────────────────────── */
+    .features-section {
+      padding: 5rem 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-title { font-size: 2.5rem; margin-bottom: 0.75rem; text-align: center; }
+    .section-subtitle { color: var(--text-secondary); text-align: center; margin-bottom: 3rem; }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .feature-card {
+      padding: 2rem;
+      background: var(--glass-bg);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      transition: all var(--transition-base);
+    }
+
+    .feature-card:hover {
+      border-color: var(--glass-border);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .feature-icon {
+      width: 48px; height: 48px;
+      border-radius: var(--radius-md);
+      background: var(--gradient-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      color: white;
+      margin-bottom: 1.25rem;
+    }
+
+    .feature-title { font-size: 1.1rem; margin-bottom: 0.5rem; }
+    .feature-desc { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; }
+
+    /* ── Recent Links ─────────────────────────────────────────── */
+    .recent-section { padding-bottom: 5rem; position: relative; z-index: 1; }
+    #recent-links { display: none; }
+
+    /* ── Footer ──────────────────────────────────────────────── */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      border-top: 1px solid var(--border-light);
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    @media (max-width: 640px) {
+      .shortener-form { flex-direction: column; }
+      .advanced-options { grid-template-columns: 1fr; }
+      .stats-bar { gap: 1.5rem; flex-wrap: wrap; }
+      .result-card { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Navbar ────────────────────────────────────────────── -->
+  <nav class="navbar">
+    <div class="container nav-inner">
+      <div class="nav-logo">⚡ LinkSnap</div>
+      <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="#features">Features</a>
+        <a href="#api-docs">API</a>
+        <a href="/dashboard.html" class="btn btn-primary btn-sm">Go to Dashboard →</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── Hero ──────────────────────────────────────────────── -->
+  <main>
+    <section class="hero">
+      <div class="hero-badge">
+        <span class="dot"></span>
+        Live Click Analytics — Real-time
+      </div>
+
+      <h1 class="hero-title">
+        Shorten. Share.<br />
+        <span class="text-gradient">Analyze Everything.</span>
+      </h1>
+
+      <p class="hero-subtitle">
+        Transform long URLs into powerful short links with deep analytics.
+        Track clicks, locations, devices, and referrers — all in real time.
+      </p>
+
+      <!-- ── Shortener Card ────────────────────────────────── -->
+      <div class="shortener-card glass-card">
+
+        <!-- API Key Input -->
+        <div class="api-key-section">
+          <i class="fas fa-key" style="color: var(--primary-light);"></i>
+          <input
+            type="text"
+            id="api-key-input"
+            class="api-key-input"
+            placeholder="Enter your API key (get one below)"
+            value="demo_key_12345"
+          />
+          <button class="btn btn-secondary btn-sm" onclick="generateApiKey()">
+            <i class="fas fa-plus"></i> Get Key
+          </button>
+        </div>
+
+        <div style="height: 1rem;"></div>
+
+        <!-- URL Input -->
+        <div class="shortener-form">
+          <input
+            type="url"
+            id="url-input"
+            class="form-input"
+            placeholder="https://your-very-long-url.com/paste/here"
+          />
+          <button class="btn btn-primary btn-lg" id="shorten-btn" onclick="shortenUrl()">
+            <span id="btn-text"><i class="fas fa-bolt"></i> Shorten</span>
+            <div class="spinner" id="btn-spinner" style="display:none;"></div>
+          </button>
+        </div>
+
+        <!-- Advanced Toggle -->
+        <div class="advanced-toggle" onclick="toggleAdvanced()">
+          <i class="fas fa-sliders" style="color: var(--primary);"></i>
+          <span>Advanced Options</span>
+          <i class="fas fa-chevron-down" id="adv-chevron" style="font-size:0.75rem; transition: transform 0.3s;"></i>
+        </div>
+
+        <!-- Advanced Options -->
+        <div class="advanced-options" id="advanced-options">
+          <div class="form-group">
+            <label class="form-label">Custom Alias</label>
+            <input type="text" id="custom-alias" class="form-input" placeholder="my-custom-link" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Expires In (days)</label>
+            <input type="number" id="expires-in" class="form-input" placeholder="30" min="1" max="365" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password Protect</label>
+            <input type="password" id="link-password" class="form-input" placeholder="Optional password" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tags (comma-separated)</label>
+            <input type="text" id="link-tags" class="form-input" placeholder="marketing, social" />
+          </div>
+          <div class="form-group" style="grid-column: 1 / -1;">
+            <label class="form-label">Link Title</label>
+            <input type="text" id="link-title" class="form-input" placeholder="Give this link a name" />
+          </div>
+        </div>
+
+        <!-- Result Section -->
+        <div id="result-section" class="glass-card" style="margin-top: 1.5rem; border: 1px solid rgba(16,185,129,0.3); background: rgba(16,185,129,0.05);">
+          <div class="result-card">
+            <div>
+              <p style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Your Short URL</p>
+              <div class="short-url-display" id="short-url-display">—</div>
+            </div>
+            <div class="result-actions">
+              <button class="btn btn-secondary btn-sm" onclick="copyUrl()">
+                <i class="fas fa-copy"></i> Copy
+              </button>
+              <button class="btn btn-secondary btn-sm" onclick="viewAnalytics()">
+                <i class="fas fa-chart-bar"></i> Analytics
+              </button>
+            </div>
+          </div>
+
+          <div class="qr-preview" id="qr-preview">
+            <img class="qr-image animate-float" id="qr-image" src="" alt="QR Code" />
+            <div class="qr-meta">
+              <p>Original: <strong id="qr-original">—</strong></p>
+              <p>Created: <strong id="qr-created">—</strong></p>
+              <p>Expires: <strong id="qr-expires">Never</strong></p>
+              <button class="btn btn-secondary btn-sm" style="margin-top: 0.5rem;" onclick="downloadQR()">
+                <i class="fas fa-download"></i> Download QR
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Stats Bar -->
+      <div class="stats-bar">
+        <div class="stats-bar-item">
+          <div class="stats-bar-number" id="stat-total-urls">0</div>
+          <div class="stats-bar-label">URLs Shortened</div>
+        </div>
+        <div class="stats-bar-item">
+          <div class="stats-bar-number" id="stat-total-clicks">0</div>
+          <div class="stats-bar-label">Total Clicks</div>
+        </div>
+        <div class="stats-bar-item">
+          <div class="stats-bar-number">62⁶</div>
+          <div class="stats-bar-label">Possible Codes</div>
+        </div>
+        <div class="stats-bar-item">
+          <div class="stats-bar-number">&lt;5ms</div>
+          <div class="stats-bar-label">Redirect Time</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Recent Links ────────────────────────────────────── -->
+    <section class="recent-section container">
+      <div id="recent-links">
+        <h2 style="margin-bottom: 1.5rem;">Your Recent Links</h2>
+        <div id="recent-links-list"></div>
+      </div>
+    </section>
+
+    <!-- ── Features Section ───────────────────────────────── -->
+    <section class="features-section container" id="features">
+      <h2 class="section-title">Everything You Need</h2>
+      <p class="section-subtitle">Not just a shortener — a complete link intelligence platform</p>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+          <h3 class="feature-title">Lightning Redirects</h3>
+          <p class="feature-desc">Sub-5ms redirects powered by MongoDB indexed lookups and Node.js async I/O. Zero latency for your users.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+          <h3 class="feature-title">Deep Analytics</h3>
+          <p class="feature-desc">Click tracking with geolocation, browser, OS, device type, and referrer breakdowns. MongoDB aggregation pipelines.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-qrcode"></i></div>
+          <h3 class="feature-title">QR Code Generator</h3>
+          <p class="feature-desc">Instant QR codes for every link. High-error-correction PNG, downloadable, branded in your colors.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-lock"></i></div>
+          <h3 class="feature-title">Password Protection</h3>
+          <p class="feature-desc">bcrypt-hashed passwords guard sensitive links. Only those with the password can access the destination.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-clock"></i></div>
+          <h3 class="feature-title">Link Expiry</h3>
+          <p class="feature-desc">Set TTL on any link. Expired links return 410 Gone. Perfect for time-limited campaigns.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+          <h3 class="feature-title">Rate Limiting</h3>
+          <p class="feature-desc">Per-IP rate limiting with express-rate-limit. Protects against abuse, spam, and brute-force attacks.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── API Docs ───────────────────────────────────────── -->
+    <section class="features-section container" id="api-docs">
+      <h2 class="section-title">REST API</h2>
+      <p class="section-subtitle">Integrate link shortening into any app</p>
+
+      <div class="glass-card">
+        <div style="display: grid; gap: 1rem;">
+          <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: rgba(16,185,129,0.05); border-radius: var(--radius-md); border: 1px solid rgba(16,185,129,0.2);">
+            <span class="badge badge-success">POST</span>
+            <code style="color: var(--text-primary); font-size: 0.9rem;">/api/shorten</code>
+            <span style="color: var(--text-muted); font-size: 0.85rem;">Shorten a URL</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: rgba(99,102,241,0.05); border-radius: var(--radius-md); border: 1px solid rgba(99,102,241,0.2);">
+            <span class="badge badge-primary">GET</span>
+            <code style="color: var(--text-primary); font-size: 0.9rem;">/api/urls</code>
+            <span style="color: var(--text-muted); font-size: 0.85rem;">List your URLs</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: rgba(99,102,241,0.05); border-radius: var(--radius-md); border: 1px solid rgba(99,102,241,0.2);">
+            <span class="badge badge-primary">GET</span>
+            <code style="color: var(--text-primary); font-size: 0.9rem;">/api/analytics/:code</code>
+            <span style="color: var(--text-muted); font-size: 0.85rem;">Get click analytics</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: rgba(239,68,68,0.05); border-radius: var(--radius-md); border: 1px solid rgba(239,68,68,0.2);">
+            <span class="badge badge-danger">DELETE</span>
+            <code style="color: var(--text-primary); font-size: 0.9rem;">/api/urls/:code</code>
+            <span style="color: var(--text-muted); font-size: 0.85rem;">Delete a link</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: rgba(99,102,241,0.05); border-radius: var(--radius-md); border: 1px solid rgba(99,102,241,0.2);">
+            <span class="badge badge-primary">GET</span>
+            <code style="color: var(--text-primary); font-size: 0.9rem;">/:code</code>
+            <span style="color: var(--text-muted); font-size: 0.85rem;">Redirect to original URL</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ── Footer ────────────────────────────────────────────── -->
+  <footer>
+    <p>Built with ❤️ using Node.js, Express & MongoDB | LinkSnap URL Shortener</p>
+  </footer>
+
+  <!-- ── Toast Container ───────────────────────────────────── -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>
