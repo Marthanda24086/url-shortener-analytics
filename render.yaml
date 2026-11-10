@@ -1,0 +1,33 @@
+services:
+  # ── Web Service (Node.js App) ──────────────────────────────
+  - type: web
+    name: url-shortener-analytics
+    runtime: node
+    plan: free
+    region: oregon
+
+    # Repository settings — Render auto-detects from GitHub
+    buildCommand: npm install
+    startCommand: npm start
+
+    # Health check — Render pings this to know the app is alive
+    healthCheckPath: /api/health
+
+    # Environment Variables
+    # SECRET values must be added manually in Render Dashboard
+    # (never commit secrets to git)
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000             # Render's default port for web services
+
+      # Set these in the Render Dashboard → Environment tab:
+      - key: MONGODB_URI
+        sync: false              # sync:false = "ask user to fill in manually"
+      - key: JWT_SECRET
+        sync: false
+      - key: DEMO_API_KEY
+        value: demo_key_12345
+      - key: BASE_URL
+        sync: false              # e.g. https://url-shortener-analytics.onrender.com
