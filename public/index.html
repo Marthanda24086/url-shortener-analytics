@@ -5,10 +5,39 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>LinkSnap // Precision URL Engine & Telemetry System</title>
   <meta name="description" content="High-precision URL shortening engine with sub-5ms routing, cryptographic Base62 synthesis, offline GeoIP telemetry, and real-time click intelligence." />
+  <meta name="theme-color" content="#07080A" />
+
+  <!-- Open Graph / Protocol Meta -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="LinkSnap // Precision URL Engine & Telemetry" />
+  <meta property="og:description" content="Sub-5ms deterministic routing with offline GeoIP resolution and real-time click telemetry." />
+  <meta property="og:image" content="/images/og-preview.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- JSON-LD Structured Data Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "LinkSnap",
+    "operatingSystem": "All",
+    "applicationCategory": "DeveloperApplication",
+    "description": "High-precision URL shortening engine with sub-5ms routing, cryptographic Base62 synthesis, and offline GeoIP telemetry.",
+    "offers": {
+      "@type": "Offer",
+      "price": "0.00",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
+
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
 <body>
+
+  <!-- Ambient Dynamic Telemetry Canvas -->
+  <canvas id="ambient-canvas" style="position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.35;"></canvas>
 
   <!-- ── Tactical Navigation Bar ────────────────────────────── -->
   <header>
@@ -132,6 +161,13 @@
                     <span id="btn-text"><i class="fas fa-bolt"></i> Synthesize</span>
                     <div class="spinner" id="btn-spinner" style="display:none;"></div>
                   </button>
+                </div>
+                <!-- One-Click Preset Telemetry Links -->
+                <div style="display: flex; gap: 0.4rem; align-items: center; margin-top: 0.4rem; flex-wrap: wrap;">
+                  <span style="font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-tertiary);">Presets:</span>
+                  <button class="btn btn-ghost btn-sm" style="font-family: var(--font-mono); font-size: 0.68rem; padding: 0.15rem 0.45rem; border: 1px solid var(--border-subtle);" onclick="setPreset('https://github.com/torvalds/linux/releases')">GitHub</button>
+                  <button class="btn btn-ghost btn-sm" style="font-family: var(--font-mono); font-size: 0.68rem; padding: 0.15rem 0.45rem; border: 1px solid var(--border-subtle);" onclick="setPreset('https://developer.mozilla.org/en-US/docs/Web/API')">MDN Docs</button>
+                  <button class="btn btn-ghost btn-sm" style="font-family: var(--font-mono); font-size: 0.68rem; padding: 0.15rem 0.45rem; border: 1px solid var(--border-subtle);" onclick="setPreset('https://datatracker.ietf.org/doc/html/rfc3986')">RFC 3986</button>
                 </div>
               </div>
 
@@ -340,7 +376,12 @@
               <button class="terminal-tab" onclick="switchApiTab('fetch', this)">Node.js (Fetch)</button>
               <button class="terminal-tab" onclick="switchApiTab('python', this)">Python</button>
             </div>
-            <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-tertiary);">ENDPOINT: /api/shorten</span>
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-tertiary);">ENDPOINT: /api/shorten</span>
+              <button class="btn btn-secondary btn-sm" onclick="copyTerminalCode()" title="Copy snippet" style="padding: 0.2rem 0.55rem; font-size: 0.72rem;">
+                <i class="fas fa-copy"></i> Copy
+              </button>
+            </div>
           </div>
 
           <pre class="terminal-content"><code id="terminal-code"><span class="token-method">curl</span> -X POST https://linksnap.internal/api/shorten \

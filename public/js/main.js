@@ -374,8 +374,109 @@ print(response.json())`;
   }
 }
 
+/* ── Preset Fill Helper ─────────────────────────────────────── */
+function setPreset(url) {
+  const input = $('url-input');
+  if (input) {
+    input.value = url;
+    input.focus();
+    showToast('Loaded preset URL', 'info');
+  }
+}
+
+/* ── Copy Terminal Code Snippet ─────────────────────────────── */
+async function copyTerminalCode() {
+  const codeEl = $('terminal-code');
+  if (!codeEl) return;
+  const rawText = codeEl.innerText || codeEl.textContent;
+  try {
+    await navigator.clipboard.writeText(rawText);
+    showToast('📋 Code copied to clipboard', 'success');
+  } catch {
+    const el = document.createElement('textarea');
+    el.value = rawText;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    showToast('📋 Code copied to clipboard', 'success');
+  }
+}
+
+/* ── Ambient Telemetry Canvas (Kinetic Background Grid) ────── */
+function initAmbientCanvas() {
+  const canvas = $('ambient-canvas');
+  if (!canvas) return;
+
+  // Check prefers-reduced-motion
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    canvas.style.display = 'none';
+    return;
+  }
+
+  const ctx = canvas.getContext('2d');
+  let width, height;
+  let mouse = { x: -1000, y: -1000 };
+
+  const resize = () => {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+  };
+  resize();
+  window.addEventListener('resize', resize, { passive: true });
+
+  window.addEventListener('mousemove', (e) => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+  }, { passive: true });
+
+  // Generate lightweight node points
+  const pointCount = Math.min(45, Math.floor(window.innerWidth / 32));
+  const points = Array.from({ length: pointCount }, () => ({
+    x: Math.random() * width,
+    y: Math.random() * height,
+    vx: (Math.random() - 0.5) * 0.4,
+    vy: (Math.random() - 0.5) * 0.4,
+    size: Math.random() * 1.5 + 0.8,
+    color: Math.random() > 0.3 ? '#FF5500' : '#00F59B',
+  }));
+
+  const loop = () => {
+    ctx.clearRect(0, 0, width, height);
+
+    for (let i = 0; i < points.length; i++) {
+      const p = points[i];
+      p.x += p.vx;
+      p.y += p.vy;
+
+      if (p.x < 0) p.x = width;
+      if (p.x > width) p.x = 0;
+      if (p.y < 0) p.y = height;
+      if (p.y > height) p.y = 0;
+
+      // Mouse repulsion/glow
+      const dx = mouse.x - p.x;
+      const dy = mouse.y - p.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 120) {
+        p.x -= (dx / dist) * 0.8;
+        p.y -= (dy / dist) * 0.8;
+      }
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.fill();
+    }
+
+    requestAnimationFrame(loop);
+  };
+  loop();
+}
+
 /* ── Keyboard Shortcuts & Initialization ────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
+  initAmbientCanvas();
   const urlInput = $('url-input');
   if (urlInput) {
     urlInput.addEventListener('keydown', (e) => {
