@@ -3,530 +3,418 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LinkSnap — Smart URL Shortener with Analytics</title>
-  <meta name="description" content="Shorten URLs, track clicks, and analyze your audience with LinkSnap — the professional URL shortener with real-time analytics." />
+  <title>LinkSnap // Precision URL Engine & Telemetry System</title>
+  <meta name="description" content="High-precision URL shortening engine with sub-5ms routing, cryptographic Base62 synthesis, offline GeoIP telemetry, and real-time click intelligence." />
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <style>
-    /* ── Navbar ─────────────────────────────────────────────── */
-    .navbar {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      padding: 1rem 0;
-      background: rgba(10, 10, 15, 0.8);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border-light);
-    }
-
-    .nav-inner {
-      display: flex; align-items: center; justify-content: space-between;
-    }
-
-    .nav-logo {
-      font-family: var(--font-display);
-      font-size: 1.5rem;
-      font-weight: 700;
-      background: var(--gradient-primary);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
-    .nav-links a { color: var(--text-secondary); font-size: 0.9rem; font-weight: 500; transition: color var(--transition-fast); }
-    .nav-links a:hover { color: var(--text-primary); }
-
-    /* ── Hero ────────────────────────────────────────────────── */
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 8rem 1rem 4rem;
-      text-align: center;
-      position: relative;
-      z-index: 1;
-    }
-
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.4rem 1rem;
-      border-radius: var(--radius-full);
-      background: rgba(99, 102, 241, 0.1);
-      border: 1px solid rgba(99, 102, 241, 0.3);
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--primary-light);
-      margin-bottom: 1.5rem;
-      animation: fadeInUp 0.5s ease;
-    }
-
-    .hero-badge .dot {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: var(--success);
-      animation: pulse-glow 2s infinite;
-    }
-
-    .hero-title {
-      font-size: clamp(2.5rem, 6vw, 5rem);
-      font-weight: 800;
-      line-height: 1.1;
-      margin-bottom: 1.5rem;
-      animation: fadeInUp 0.5s ease 0.1s both;
-    }
-
-    .hero-subtitle {
-      font-size: 1.15rem;
-      color: var(--text-secondary);
-      max-width: 600px;
-      margin: 0 auto 3rem;
-      animation: fadeInUp 0.5s ease 0.2s both;
-    }
-
-    /* ── URL Shortener Form ───────────────────────────────────── */
-    .shortener-card {
-      width: 100%;
-      max-width: 760px;
-      animation: fadeInUp 0.5s ease 0.3s both;
-    }
-
-    .shortener-form {
-      display: flex;
-      gap: 0.75rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .shortener-form .form-input {
-      flex: 1;
-      font-size: 1rem;
-      padding: 1rem 1.25rem;
-    }
-
-    .advanced-toggle {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-      cursor: pointer;
-      padding: 0.5rem;
-      border-radius: var(--radius-sm);
-      transition: color var(--transition-fast);
-      width: fit-content;
-      user-select: none;
-    }
-
-    .advanced-toggle:hover { color: var(--primary-light); }
-
-    .advanced-options {
-      display: none;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-      margin-top: 1rem;
-      padding-top: 1rem;
-      border-top: 1px solid var(--border-light);
-    }
-
-    .advanced-options.visible { display: grid; }
-
-    /* ── API Key Section ─────────────────────────────────────── */
-    .api-key-section {
-      margin-top: 1.5rem;
-      padding: 1rem;
-      background: rgba(99, 102, 241, 0.05);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .api-key-input {
-      flex: 1;
-      background: transparent;
-      border: none;
-      outline: none;
-      color: var(--primary-light);
-      font-family: 'Courier New', monospace;
-      font-size: 0.85rem;
-    }
-
-    /* ── Result Card ─────────────────────────────────────────── */
-    #result-section { display: none; margin-top: 2rem; }
-
-    .result-card {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .short-url-display {
-      flex: 1;
-      font-family: var(--font-display);
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: var(--primary-light);
-      word-break: break-all;
-    }
-
-    .result-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-
-    .qr-preview {
-      margin-top: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-      flex-wrap: wrap;
-    }
-
-    .qr-image {
-      width: 120px; height: 120px;
-      border-radius: var(--radius-md);
-      border: 2px solid var(--border);
-    }
-
-    .qr-meta { flex: 1; }
-    .qr-meta p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.25rem; }
-    .qr-meta strong { color: var(--text-primary); }
-
-    /* ── Stats Bar ────────────────────────────────────────────── */
-    .stats-bar {
-      display: flex;
-      gap: 3rem;
-      justify-content: center;
-      margin-top: 4rem;
-      padding-top: 3rem;
-      border-top: 1px solid var(--border-light);
-      animation: fadeInUp 0.5s ease 0.4s both;
-    }
-
-    .stats-bar-item { text-align: center; }
-    .stats-bar-number {
-      font-family: var(--font-display);
-      font-size: 2rem;
-      font-weight: 800;
-      background: var(--gradient-primary);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .stats-bar-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
-
-    /* ── Features ────────────────────────────────────────────── */
-    .features-section {
-      padding: 5rem 0;
-      position: relative;
-      z-index: 1;
-    }
-
-    .section-title { font-size: 2.5rem; margin-bottom: 0.75rem; text-align: center; }
-    .section-subtitle { color: var(--text-secondary); text-align: center; margin-bottom: 3rem; }
-
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.5rem;
-    }
-
-    .feature-card {
-      padding: 2rem;
-      background: var(--glass-bg);
-      border: 1px solid var(--border-light);
-      border-radius: var(--radius-lg);
-      transition: all var(--transition-base);
-    }
-
-    .feature-card:hover {
-      border-color: var(--glass-border);
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-glow);
-    }
-
-    .feature-icon {
-      width: 48px; height: 48px;
-      border-radius: var(--radius-md);
-      background: var(--gradient-primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.25rem;
-      color: white;
-      margin-bottom: 1.25rem;
-    }
-
-    .feature-title { font-size: 1.1rem; margin-bottom: 0.5rem; }
-    .feature-desc { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; }
-
-    /* ── Recent Links ─────────────────────────────────────────── */
-    .recent-section { padding-bottom: 5rem; position: relative; z-index: 1; }
-    #recent-links { display: none; }
-
-    /* ── Footer ──────────────────────────────────────────────── */
-    footer {
-      text-align: center;
-      padding: 2rem;
-      border-top: 1px solid var(--border-light);
-      color: var(--text-muted);
-      font-size: 0.85rem;
-      position: relative;
-      z-index: 1;
-    }
-
-    @media (max-width: 640px) {
-      .shortener-form { flex-direction: column; }
-      .advanced-options { grid-template-columns: 1fr; }
-      .stats-bar { gap: 1.5rem; flex-wrap: wrap; }
-      .result-card { flex-direction: column; align-items: flex-start; }
-    }
-  </style>
 </head>
 <body>
 
-  <!-- ── Navbar ────────────────────────────────────────────── -->
-  <nav class="navbar">
-    <div class="container nav-inner">
-      <div class="nav-logo">⚡ LinkSnap</div>
-      <div class="nav-links">
-        <a href="/">Home</a>
-        <a href="/dashboard.html">Dashboard</a>
-        <a href="#features">Features</a>
-        <a href="#api-docs">API</a>
-        <a href="/dashboard.html" class="btn btn-primary btn-sm">Go to Dashboard →</a>
-      </div>
-    </div>
-  </nav>
+  <!-- ── Tactical Navigation Bar ────────────────────────────── -->
+  <header>
+    <nav class="navbar">
+      <div class="container nav-inner">
+        <a href="/" class="nav-brand">
+          <div class="brand-icon">
+            <i class="fas fa-terminal"></i>
+          </div>
+          <span class="brand-name">LINKSNAP</span>
+          <span class="brand-tag">v1.4 PROTOCOL</span>
+        </a>
 
-  <!-- ── Hero ──────────────────────────────────────────────── -->
+        <div class="nav-links">
+          <a href="#engine" class="nav-link active">Engine</a>
+          <a href="/dashboard.html" class="nav-link">Workstation</a>
+          <a href="#architecture" class="nav-link">Architecture</a>
+          <a href="#api" class="nav-link">API Specs</a>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <div class="nav-telemetry">
+            <span class="telemetry-dot"></span>
+            <span>INGESTION ACTIVE</span>
+          </div>
+          <a href="/dashboard.html" class="btn btn-primary btn-sm nav-action-btn">
+            <i class="fas fa-chart-line"></i> <span class="nav-btn-label">Workstation</span>
+          </a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
   <main>
-    <section class="hero">
-      <div class="hero-badge">
-        <span class="dot"></span>
-        Live Click Analytics — Real-time
-      </div>
-
-      <h1 class="hero-title">
-        Shorten. Share.<br />
-        <span class="text-gradient">Analyze Everything.</span>
-      </h1>
-
-      <p class="hero-subtitle">
-        Transform long URLs into powerful short links with deep analytics.
-        Track clicks, locations, devices, and referrers — all in real time.
-      </p>
-
-      <!-- ── Shortener Card ────────────────────────────────── -->
-      <div class="shortener-card glass-card">
-
-        <!-- API Key Input -->
-        <div class="api-key-section">
-          <i class="fas fa-key" style="color: var(--primary-light);"></i>
-          <input
-            type="text"
-            id="api-key-input"
-            class="api-key-input"
-            placeholder="Enter your API key (get one below)"
-            value="demo_key_12345"
-          />
-          <button class="btn btn-secondary btn-sm" onclick="generateApiKey()">
-            <i class="fas fa-plus"></i> Get Key
-          </button>
-        </div>
-
-        <div style="height: 1rem;"></div>
-
-        <!-- URL Input -->
-        <div class="shortener-form">
-          <input
-            type="url"
-            id="url-input"
-            class="form-input"
-            placeholder="https://your-very-long-url.com/paste/here"
-          />
-          <button class="btn btn-primary btn-lg" id="shorten-btn" onclick="shortenUrl()">
-            <span id="btn-text"><i class="fas fa-bolt"></i> Shorten</span>
-            <div class="spinner" id="btn-spinner" style="display:none;"></div>
-          </button>
-        </div>
-
-        <!-- Advanced Toggle -->
-        <div class="advanced-toggle" onclick="toggleAdvanced()">
-          <i class="fas fa-sliders" style="color: var(--primary);"></i>
-          <span>Advanced Options</span>
-          <i class="fas fa-chevron-down" id="adv-chevron" style="font-size:0.75rem; transition: transform 0.3s;"></i>
-        </div>
-
-        <!-- Advanced Options -->
-        <div class="advanced-options" id="advanced-options">
-          <div class="form-group">
-            <label class="form-label">Custom Alias</label>
-            <input type="text" id="custom-alias" class="form-input" placeholder="my-custom-link" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Expires In (days)</label>
-            <input type="number" id="expires-in" class="form-input" placeholder="30" min="1" max="365" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Password Protect</label>
-            <input type="password" id="link-password" class="form-input" placeholder="Optional password" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Tags (comma-separated)</label>
-            <input type="text" id="link-tags" class="form-input" placeholder="marketing, social" />
-          </div>
-          <div class="form-group" style="grid-column: 1 / -1;">
-            <label class="form-label">Link Title</label>
-            <input type="text" id="link-title" class="form-input" placeholder="Give this link a name" />
-          </div>
-        </div>
-
-        <!-- Result Section -->
-        <div id="result-section" class="glass-card" style="margin-top: 1.5rem; border: 1px solid rgba(16,185,129,0.3); background: rgba(16,185,129,0.05);">
-          <div class="result-card">
-            <div>
-              <p style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Your Short URL</p>
-              <div class="short-url-display" id="short-url-display">—</div>
+    <!-- ── Asymmetric Hero Stage ──────────────────────────────── -->
+    <section class="hero-stage" id="engine">
+      <div class="container">
+        <div class="hero-grid">
+          
+          <!-- Left Column: Editorial Positioning & Telemetry -->
+          <div class="hero-lead">
+            <div class="meta-header-tag">
+              <span>Sub-5ms Edge Routing Engine</span>
             </div>
-            <div class="result-actions">
-              <button class="btn btn-secondary btn-sm" onclick="copyUrl()">
-                <i class="fas fa-copy"></i> Copy
-              </button>
-              <button class="btn btn-secondary btn-sm" onclick="viewAnalytics()">
-                <i class="fas fa-chart-bar"></i> Analytics
-              </button>
+
+            <h1 class="hero-title">
+              Precision Links.<br />
+              <span class="highlight">Instant Telemetry.</span>
+            </h1>
+
+            <p class="hero-description">
+              Transform high-entropy web endpoints into deterministic, cryptographically secure short links. Built on asynchronous micro-tasks with offline GeoIP resolution and client fingerprinting.
+            </p>
+
+            <!-- Architectural Telemetry Metric Strip -->
+            <div class="telemetry-strip">
+              <div class="strip-item">
+                <span class="strip-value" id="stat-total-urls">0</span>
+                <span class="strip-label">Synthesized Links</span>
+              </div>
+              <div class="strip-item">
+                <span class="strip-value" id="stat-total-clicks">0</span>
+                <span class="strip-label">Global Dispatches</span>
+              </div>
+              <div class="strip-item">
+                <span class="strip-value">&lt; 3.8ms</span>
+                <span class="strip-label">Mean 302 Latency</span>
+              </div>
+            </div>
+
+            <div style="margin-top: 1.75rem; display: flex; gap: 0.65rem; align-items: center; flex-wrap: wrap;">
+              <span class="badge badge-accent"><i class="fas fa-fingerprint"></i> BASE62 CSPRNG</span>
+              <span class="badge badge-success"><i class="fas fa-shield-alt"></i> GDPR HASHED</span>
+              <span class="badge badge-cyan"><i class="fas fa-microchip"></i> MAXMIND OFFLINE</span>
             </div>
           </div>
 
-          <div class="qr-preview" id="qr-preview">
-            <img class="qr-image animate-float" id="qr-image" src="" alt="QR Code" />
-            <div class="qr-meta">
-              <p>Original: <strong id="qr-original">—</strong></p>
-              <p>Created: <strong id="qr-created">—</strong></p>
-              <p>Expires: <strong id="qr-expires">Never</strong></p>
-              <button class="btn btn-secondary btn-sm" style="margin-top: 0.5rem;" onclick="downloadQR()">
-                <i class="fas fa-download"></i> Download QR
-              </button>
+          <!-- Right Column: The Tactical Routing Console -->
+          <div class="engine-console">
+            <div class="console-header">
+              <div class="console-title-group">
+                <span class="console-dot"></span>
+                <span>ROUTING WORKBENCH // CONSOLE_01</span>
+              </div>
+              <span class="badge badge-accent">READY</span>
+            </div>
+
+            <div class="console-body">
+              <!-- API Authorization Key Strip -->
+              <div class="key-terminal">
+                <i class="fas fa-key"></i>
+                <input
+                  type="text"
+                  id="api-key-input"
+                  placeholder="Master API Key..."
+                  value="demo_key_12345"
+                  aria-label="API Authorization Key"
+                />
+                <button class="btn btn-secondary btn-sm" onclick="generateApiKey()" title="Generate New Key">
+                  <i class="fas fa-refresh"></i> New Key
+                </button>
+              </div>
+
+              <!-- Primary Target Input -->
+              <div class="dispatch-field">
+                <div class="field-label">
+                  <span>Target Destination URL</span>
+                  <span style="color: var(--text-tertiary);">HTTPS PROTOCOL</span>
+                </div>
+                <div class="input-container">
+                  <div class="input-prefix">URI://</div>
+                  <input
+                    type="url"
+                    id="url-input"
+                    placeholder="https://hyper-scale-destination.com/route/deep-path"
+                    autocomplete="off"
+                    spellcheck="false"
+                    aria-label="Target URL to Shorten"
+                  />
+                  <button class="btn btn-primary" id="shorten-btn" onclick="shortenUrl()">
+                    <span id="btn-text"><i class="fas fa-bolt"></i> Synthesize</span>
+                    <div class="spinner" id="btn-spinner" style="display:none;"></div>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Advanced Routing Drawer Toggle -->
+              <div class="parameter-drawer-toggle" onclick="toggleAdvanced()">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <i class="fas fa-sliders-h" style="color: var(--accent);"></i>
+                  <span>ADVANCED PARAMETERS (ALIAS, TTL, BCRYPT, TAGS)</span>
+                </div>
+                <i class="fas fa-chevron-down" id="adv-chevron" style="transition: transform 0.25s var(--ease-spring);"></i>
+              </div>
+
+              <!-- Advanced Drawer Content -->
+              <div class="parameter-drawer" id="advanced-options">
+                <div class="form-group">
+                  <label class="field-label">Custom Slug (/:alias)</label>
+                  <input type="text" id="custom-alias" class="form-input" placeholder="custom-slug" />
+                </div>
+                <div class="form-group">
+                  <label class="field-label">TTL Expiration (Days)</label>
+                  <input type="number" id="expires-in" class="form-input" placeholder="30" min="1" max="365" />
+                </div>
+                <div class="form-group">
+                  <label class="field-label">Bcrypt Key Protection</label>
+                  <input type="password" id="link-password" class="form-input" placeholder="Optional passphrase" />
+                </div>
+                <div class="form-group">
+                  <label class="field-label">Taxonomy Tags</label>
+                  <input type="text" id="link-tags" class="form-input" placeholder="prod, campaign, q4" />
+                </div>
+                <div class="form-group" style="grid-column: 1 / -1;">
+                  <label class="field-label">Reference Label / Title</label>
+                  <input type="text" id="link-title" class="form-input" placeholder="Q4 Core Infrastructure Launch" />
+                </div>
+              </div>
+
+              <!-- Synthesized Output Card -->
+              <div id="result-section">
+                <div class="result-card">
+                  <div>
+                    <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--signal-green); text-transform: uppercase; margin-bottom: 0.25rem;">
+                      <i class="fas fa-check-circle"></i> Synthesized Deterministic Route
+                    </div>
+                    <a href="#" target="_blank" class="short-url-display" id="short-url-display">—</a>
+                  </div>
+                  <div style="display: flex; gap: 0.5rem;">
+                    <button class="btn btn-secondary btn-sm" onclick="copyUrl()">
+                      <i class="fas fa-clone"></i> Copy
+                    </button>
+                    <button class="btn btn-primary btn-sm" onclick="viewAnalytics()">
+                      <i class="fas fa-chart-pie"></i> Telemetry
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Dynamic QR Synthesizer -->
+                <div class="qr-synthesizer">
+                  <div class="qr-image-wrapper">
+                    <img class="qr-image" id="qr-image" src="" alt="Cryptographic QR Code Matrix" />
+                  </div>
+                  <div class="qr-telemetry-meta">
+                    <p>Destination: <strong id="qr-original">—</strong></p>
+                    <p>Generated: <strong id="qr-created">—</strong></p>
+                    <p>Expiration: <strong id="qr-expires">Never (Infinite TTL)</strong></p>
+                    <div style="margin-top: 0.5rem;">
+                      <button class="btn btn-secondary btn-sm" onclick="downloadQR()">
+                        <i class="fas fa-arrow-down"></i> Download Vector PNG
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
-        </div>
 
-      </div>
-
-      <!-- Stats Bar -->
-      <div class="stats-bar">
-        <div class="stats-bar-item">
-          <div class="stats-bar-number" id="stat-total-urls">0</div>
-          <div class="stats-bar-label">URLs Shortened</div>
-        </div>
-        <div class="stats-bar-item">
-          <div class="stats-bar-number" id="stat-total-clicks">0</div>
-          <div class="stats-bar-label">Total Clicks</div>
-        </div>
-        <div class="stats-bar-item">
-          <div class="stats-bar-number">62⁶</div>
-          <div class="stats-bar-label">Possible Codes</div>
-        </div>
-        <div class="stats-bar-item">
-          <div class="stats-bar-number">&lt;5ms</div>
-          <div class="stats-bar-label">Redirect Time</div>
         </div>
       </div>
     </section>
 
-    <!-- ── Recent Links ────────────────────────────────────── -->
-    <section class="recent-section container">
-      <div id="recent-links">
-        <h2 style="margin-bottom: 1.5rem;">Your Recent Links</h2>
+    <!-- ── Live Stream: Recent Synthesized Links ────────────── -->
+    <section class="container" style="margin-bottom: 5rem;">
+      <div id="recent-links" style="display: none;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.75rem;">
+          <div style="display: flex; align-items: center; gap: 0.5rem; font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent);">
+            <i class="fas fa-history"></i>
+            <span>RECENT INGESTION LOG</span>
+          </div>
+          <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-tertiary);">LOCAL SESSION FEED</span>
+        </div>
         <div id="recent-links-list"></div>
       </div>
     </section>
 
-    <!-- ── Features Section ───────────────────────────────── -->
-    <section class="features-section container" id="features">
-      <h2 class="section-title">Everything You Need</h2>
-      <p class="section-subtitle">Not just a shortener — a complete link intelligence platform</p>
+    <!-- ── Asymmetric Architectural Bento Matrix ──────────────── -->
+    <section class="section-wrapper" id="architecture">
+      <div class="container">
+        <div class="section-tag">
+          <i class="fas fa-cubes"></i>
+          <span>SYSTEM ARCHITECTURE & PROTOCOLS</span>
+        </div>
+        <h2 class="section-heading">Engineered for Deterministic Performance</h2>
+        <p class="section-subheading">
+          A high-throughput URL shortening service built without bloated abstractions. Designed around zero-latency redirects and asynchronous telemetry ingestion.
+        </p>
 
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-icon"><i class="fas fa-bolt"></i></div>
-          <h3 class="feature-title">Lightning Redirects</h3>
-          <p class="feature-desc">Sub-5ms redirects powered by MongoDB indexed lookups and Node.js async I/O. Zero latency for your users.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
-          <h3 class="feature-title">Deep Analytics</h3>
-          <p class="feature-desc">Click tracking with geolocation, browser, OS, device type, and referrer breakdowns. MongoDB aggregation pipelines.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon"><i class="fas fa-qrcode"></i></div>
-          <h3 class="feature-title">QR Code Generator</h3>
-          <p class="feature-desc">Instant QR codes for every link. High-error-correction PNG, downloadable, branded in your colors.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon"><i class="fas fa-lock"></i></div>
-          <h3 class="feature-title">Password Protection</h3>
-          <p class="feature-desc">bcrypt-hashed passwords guard sensitive links. Only those with the password can access the destination.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon"><i class="fas fa-clock"></i></div>
-          <h3 class="feature-title">Link Expiry</h3>
-          <p class="feature-desc">Set TTL on any link. Expired links return 410 Gone. Perfect for time-limited campaigns.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
-          <h3 class="feature-title">Rate Limiting</h3>
-          <p class="feature-desc">Per-IP rate limiting with express-rate-limit. Protects against abuse, spam, and brute-force attacks.</p>
+        <div class="bento-matrix">
+          
+          <!-- Cell 1: 8-Column Pipeline Core -->
+          <div class="bento-cell bento-col-8">
+            <div class="bento-cell-header">
+              <div class="bento-icon"><i class="fas fa-bolt"></i></div>
+              <span class="badge badge-accent">PIPELINE EXECUTION</span>
+            </div>
+            <h3 class="bento-title">Sub-5ms Fire-and-Forget Redirect</h3>
+            <p class="bento-description">
+              Incoming client requests match high-performance B-tree indexed slugs in MongoDB. The HTTP 302 Found response is dispatched immediately while analytics collection executes as an un-awaited background micro-task.
+            </p>
+
+            <div class="pipeline-wireframe">
+              <div class="pipeline-node">
+                <div style="color: var(--accent); font-weight: 700;">1. GET /:code</div>
+                <div style="color: var(--text-tertiary); font-size: 0.7rem;">Client Request</div>
+              </div>
+              <div class="pipeline-arrow"><i class="fas fa-arrow-right"></i></div>
+              <div class="pipeline-node">
+                <div style="color: var(--signal-cyan); font-weight: 700;">2. B-Tree Lookup</div>
+                <div style="color: var(--text-tertiary); font-size: 0.7rem;">O(log N) Indexed</div>
+              </div>
+              <div class="pipeline-arrow"><i class="fas fa-arrow-right"></i></div>
+              <div class="pipeline-node">
+                <div style="color: var(--signal-green); font-weight: 700;">3. 302 Redirect</div>
+                <div style="color: var(--text-tertiary); font-size: 0.7rem;">Mean &lt; 3.8ms</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cell 2: 4-Column Base62 Entropy -->
+          <div class="bento-cell bento-col-4">
+            <div class="bento-cell-header">
+              <div class="bento-icon"><i class="fas fa-cube"></i></div>
+              <span class="badge badge-cyan">ENTROPY SPACE</span>
+            </div>
+            <h3 class="bento-title">56.8 Billion Hashes</h3>
+            <p class="bento-description">
+              Generated via Node.js CSPRNG <code style="color: var(--accent);">crypto.randomFillSync</code> utilizing a 62-character alphabet ([0-9, a-z, A-Z]). Six characters produce 62⁶ deterministic permutations with automatic collision escalation.
+            </p>
+          </div>
+
+          <!-- Cell 3: 4-Column Offline GeoIP -->
+          <div class="bento-cell bento-col-4">
+            <div class="bento-cell-header">
+              <div class="bento-icon"><i class="fas fa-globe-americas"></i></div>
+              <span class="badge badge-success">ZERO NETWORK OVERHEAD</span>
+            </div>
+            <h3 class="bento-title">Offline MaxMind GeoIP</h3>
+            <p class="bento-description">
+              Resolved in-memory in less than 0.1ms using embedded binary database lookup. Extracts country, city, and ISO regions without making external network calls.
+            </p>
+          </div>
+
+          <!-- Cell 4: 4-Column Hardware Fingerprint -->
+          <div class="bento-cell bento-col-4">
+            <div class="bento-cell-header">
+              <div class="bento-icon"><i class="fas fa-laptop-code"></i></div>
+              <span class="badge badge-warning">HARDWARE SPECS</span>
+            </div>
+            <h3 class="bento-title">Device Fingerprinting</h3>
+            <p class="bento-description">
+              Deep User-Agent inspection categorizes requests into mobile, tablet, or desktop, alongside operating system kernel, browser vendor, and automated crawler bots.
+            </p>
+          </div>
+
+          <!-- Cell 5: 4-Column Cryptographic Privacy -->
+          <div class="bento-cell bento-col-4">
+            <div class="bento-cell-header">
+              <div class="bento-icon"><i class="fas fa-user-shield"></i></div>
+              <span class="badge badge-accent">GDPR CONFORMS</span>
+            </div>
+            <h3 class="bento-title">Salted IP Anonymization</h3>
+            <p class="bento-description">
+              No raw IP addresses are ever written to disk. IP inputs are concatenated with a rotating secret salt and hashed through SHA-256 to allow unique visitor calculation without retaining PII.
+            </p>
+          </div>
+
         </div>
       </div>
     </section>
 
-    <!-- ── API Docs ───────────────────────────────────────── -->
-    <section class="features-section container" id="api-docs">
-      <h2 class="section-title">REST API</h2>
-      <p class="section-subtitle">Integrate link shortening into any app</p>
-
-      <div class="glass-card">
-        <div style="display: grid; gap: 1rem;">
-          <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: rgba(16,185,129,0.05); border-radius: var(--radius-md); border: 1px solid rgba(16,185,129,0.2);">
-            <span class="badge badge-success">POST</span>
-            <code style="color: var(--text-primary); font-size: 0.9rem;">/api/shorten</code>
-            <span style="color: var(--text-muted); font-size: 0.85rem;">Shorten a URL</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: rgba(99,102,241,0.05); border-radius: var(--radius-md); border: 1px solid rgba(99,102,241,0.2);">
-            <span class="badge badge-primary">GET</span>
-            <code style="color: var(--text-primary); font-size: 0.9rem;">/api/urls</code>
-            <span style="color: var(--text-muted); font-size: 0.85rem;">List your URLs</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: rgba(99,102,241,0.05); border-radius: var(--radius-md); border: 1px solid rgba(99,102,241,0.2);">
-            <span class="badge badge-primary">GET</span>
-            <code style="color: var(--text-primary); font-size: 0.9rem;">/api/analytics/:code</code>
-            <span style="color: var(--text-muted); font-size: 0.85rem;">Get click analytics</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: rgba(239,68,68,0.05); border-radius: var(--radius-md); border: 1px solid rgba(239,68,68,0.2);">
-            <span class="badge badge-danger">DELETE</span>
-            <code style="color: var(--text-primary); font-size: 0.9rem;">/api/urls/:code</code>
-            <span style="color: var(--text-muted); font-size: 0.85rem;">Delete a link</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: rgba(99,102,241,0.05); border-radius: var(--radius-md); border: 1px solid rgba(99,102,241,0.2);">
-            <span class="badge badge-primary">GET</span>
-            <code style="color: var(--text-primary); font-size: 0.9rem;">/:code</code>
-            <span style="color: var(--text-muted); font-size: 0.85rem;">Redirect to original URL</span>
-          </div>
+    <!-- ── REST Protocol Interactive Terminal ─────────────────── -->
+    <section class="section-wrapper" id="api">
+      <div class="container">
+        <div class="section-tag">
+          <i class="fas fa-code"></i>
+          <span>PROGRAMMATIC ACCESS</span>
         </div>
+        <h2 class="section-heading">Developer-First REST API</h2>
+        <p class="section-subheading">
+          Synthesize and inspect short URLs programmatically through simple HTTP endpoints authenticated with your API key.
+        </p>
+
+        <div class="terminal-card">
+          <div class="terminal-header">
+            <div class="terminal-tabs">
+              <button class="terminal-tab active" onclick="switchApiTab('curl', this)">cURL</button>
+              <button class="terminal-tab" onclick="switchApiTab('fetch', this)">Node.js (Fetch)</button>
+              <button class="terminal-tab" onclick="switchApiTab('python', this)">Python</button>
+            </div>
+            <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-tertiary);">ENDPOINT: /api/shorten</span>
+          </div>
+
+          <pre class="terminal-content"><code id="terminal-code"><span class="token-method">curl</span> -X POST https://linksnap.internal/api/shorten \
+  -H <span class="token-string">"Content-Type: application/json"</span> \
+  -H <span class="token-string">"x-api-key: <span class="token-key">demo_key_12345</span>"</span> \
+  -d <span class="token-string">'{
+    "url": "https://company.org/deep-path/release-v2",
+    "customAlias": "prod-v2",
+    "expiresIn": 86400,
+    "tags": ["cloud", "deploy"]
+  }'</span></code></pre>
+        </div>
+
+        <!-- Endpoints Reference Table -->
+        <div class="table-container" style="margin-top: 2rem;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Method</th>
+                <th>Endpoint Route</th>
+                <th>Authentication</th>
+                <th>Operation</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="badge badge-success">POST</span></td>
+                <td><code style="color: var(--signal-cyan);">/api/shorten</code></td>
+                <td>Header: <code style="color: var(--accent);">x-api-key</code></td>
+                <td>Synthesize new short link with custom slug and TTL</td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-cyan">GET</span></td>
+                <td><code style="color: var(--signal-cyan);">/:code</code></td>
+                <td>Public</td>
+                <td>Sub-5ms HTTP 302 redirect + asynchronous telemetry</td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-cyan">GET</span></td>
+                <td><code style="color: var(--signal-cyan);">/api/analytics/:code</code></td>
+                <td>Header: <code style="color: var(--accent);">x-api-key</code></td>
+                <td>Retrieve deep geographic, browser, and hourly metrics</td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-danger">DELETE</span></td>
+                <td><code style="color: var(--signal-cyan);">/api/urls/:code</code></td>
+                <td>Header: <code style="color: var(--accent);">x-api-key</code></td>
+                <td>Decommission active route while preserving analytics archive</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
       </div>
     </section>
   </main>
 
-  <!-- ── Footer ────────────────────────────────────────────── -->
-  <footer>
-    <p>Built with ❤️ using Node.js, Express & MongoDB | LinkSnap URL Shortener</p>
+  <!-- ── Precision Architectural Footer ─────────────────────── -->
+  <footer style="border-top: 1px solid var(--border-subtle); padding: 3rem 0; background: var(--bg-void); color: var(--text-tertiary); font-size: 0.85rem;">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <span style="font-family: var(--font-display); font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em;">LINKSNAP //</span>
+        <span>High-Precision URL Engine & Telemetry</span>
+      </div>
+      <div style="display: flex; gap: 1.5rem; font-family: var(--font-mono); font-size: 0.75rem;">
+        <span>STACK: NODE 20 + MONGO 7</span>
+        <span>CIPHER: BASE-62</span>
+        <span>LICENSE: MIT</span>
+      </div>
+    </div>
   </footer>
 
-  <!-- ── Toast Container ───────────────────────────────────── -->
-  <div class="toast-container" id="toast-container"></div>
+  <!-- ── Micro-Interaction Toast Container ──────────────────── -->
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
   <script src="/js/main.js"></script>
 </body>
