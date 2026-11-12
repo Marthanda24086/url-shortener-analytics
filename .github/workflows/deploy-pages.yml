@@ -1,0 +1,34 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main   # triggers on every push to main
+
+# Allow only one concurrent deployment
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    # Grant GITHUB_TOKEN the permissions needed to push to gh-pages
+    permissions:
+      contents: write
+
+    steps:
+      # 1. Check out the repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Deploy the contents of public/ to the gh-pages branch
+      #    The action creates/updates the gh-pages branch automatically.
+      - name: Deploy public/ folder to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public        # your static files live here
+          publish_branch: gh-pages     # deploys to this branch
+          commit_message: "deploy: auto-publish from ${{ github.sha }}"

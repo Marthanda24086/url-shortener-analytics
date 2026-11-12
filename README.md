@@ -10,7 +10,7 @@
 
 A high-performance, full-stack **URL Shortener** and **Real-Time Telemetry Workstation** designed with Swiss modernist precision engineering. Features sub-5ms 302 redirects, offline MaxMind GeoIP resolution, User-Agent hardware fingerprinting, cryptographic Base62 synthesis, dynamic QR generation, and an aerospace-grade analytics dashboard.
 
-[Live Demo](#-live-deployment-guide) • [Architecture](#-architecture) • [Design System](#-design-system) • [Documentation Suite](#-documentation-suite) • [Quick Start](#-quick-start) • [API Specs](#-api-documentation)
+[🌐 Live Preview](https://marthanda24086.github.io/url-shortener-analytics/) • [Architecture](#-architecture) • [Design System](#-design-system) • [Documentation Suite](#-documentation-suite) • [Quick Start](#-quick-start) • [API Specs](#-api-documentation)
 
 </div>
 
