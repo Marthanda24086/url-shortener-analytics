@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LinkSnap // Telemetry Workstation</title>
+  <meta name="description" content="High-precision telemetry workstation and real-time click intelligence for LinkSnap routes." />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<div class="dashboard-viewport">
+
+  <!-- ── Tactical Command Sidebar ────────────────────────────── -->
+  <aside class="dashboard-sidebar">
+    <div>
+      <a href="/" class="sidebar-brand-lockup">
+        <div class="brand-icon">
+          <i class="fas fa-terminal"></i>
+        </div>
+        <div>
+          <div class="brand-name">LINKSNAP</div>
+          <div style="font-family: var(--font-mono); font-size: 0.65rem; color: var(--accent); letter-spacing: 0.05em;">TELEMETRY WORKSTATION</div>
+        </div>
+      </a>
+
+      <div style="margin-bottom: 1.5rem;">
+        <div style="font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.75rem; padding-left: 0.5rem;">
+          Navigation Views
+        </div>
+        <ul class="sidebar-nav-list">
+          <li class="sidebar-item active" onclick="showSection('overview')">
+            <i class="fas fa-chart-line"></i>
+            <span>Overview</span>
+          </li>
+          <li class="sidebar-item" onclick="showSection('links')">
+            <i class="fas fa-database"></i>
+            <span>Route Inventory</span>
+          </li>
+          <li class="sidebar-item" onclick="showSection('analytics')">
+            <i class="fas fa-crosshairs"></i>
+            <span>Deep Inspector</span>
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <div style="font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.75rem; padding-left: 0.5rem;">
+          Commands & Ops
+        </div>
+        <ul class="sidebar-nav-list">
+          <li class="sidebar-item" onclick="window.location.href='/'">
+            <i class="fas fa-plus"></i>
+            <span>Synthesize Route</span>
+          </li>
+          <li class="sidebar-item" onclick="checkHealth()">
+            <i class="fas fa-heartbeat"></i>
+            <span>Engine Health</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div style="display: flex; align-items: center; justify-content: space-between; font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
+        <span>INGESTION STATUS</span>
+        <span class="badge badge-success" style="font-size: 0.65rem;">ACTIVE</span>
+      </div>
+      <div style="font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-tertiary);">
+        NODE v20 // MONGO 7 CLUSTER
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Workstation Main Stage ──────────────────────────────── -->
+  <main class="dashboard-workstation">
+
+    <!-- Top Key Authorization Strip -->
+    <div class="workstation-topbar">
+      <div>
+        <div class="workstation-title">Telemetry Workstation</div>
+        <div class="workstation-subtitle">Real-time click intelligence & edge routing inspection</div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+        <!-- Authorization Key Input -->
+        <div class="key-terminal" style="min-width: 260px;">
+          <i class="fas fa-key"></i>
+          <input
+            type="text"
+            id="dash-api-key"
+            value="demo_key_12345"
+            placeholder="API Authorization Key..."
+            aria-label="API Authorization Key"
+          />
+          <button class="btn btn-secondary btn-sm" onclick="loadDashboard()" title="Sync Telemetry">
+            <i class="fas fa-sync-alt"></i> Sync
+          </button>
+        </div>
+
+        <a href="/" class="btn btn-primary btn-sm">
+          <i class="fas fa-plus"></i> New Route
+        </a>
+      </div>
+    </div>
+
+    <!-- Mobile Navigation Tab Bar (visible on narrow screens) -->
+    <div class="mobile-nav-pills" style="display: none; margin-bottom: 1.5rem; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.25rem;">
+      <button class="btn btn-primary btn-sm m-nav-btn" onclick="showSection('overview')">Overview</button>
+      <button class="btn btn-secondary btn-sm m-nav-btn" onclick="showSection('links')">Inventory</button>
+      <button class="btn btn-secondary btn-sm m-nav-btn" onclick="showSection('analytics')">Deep Inspector</button>
+    </div>
+
+    <!-- ══ SECTION 1: OVERVIEW ═══════════════════════════════════ -->
+    <div id="section-overview">
+      
+      <!-- Precision KPI Metric Ribbon -->
+      <div class="kpi-ribbon">
+        <div class="kpi-card">
+          <div class="kpi-meta">
+            <span class="kpi-label">Active Routes</span>
+            <span class="badge badge-accent">TOTAL</span>
+          </div>
+          <div class="kpi-value" id="stat-links">—</div>
+          <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--signal-green); margin-top: 0.5rem;">
+            <i class="fas fa-check"></i> ALL SYSTEMS NOMINAL
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-meta">
+            <span class="kpi-label">Cumulative Dispatches</span>
+            <span class="badge badge-success">302 FOUND</span>
+          </div>
+          <div class="kpi-value" id="stat-clicks">—</div>
+          <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-tertiary); margin-top: 0.5rem;">
+            AGGREGATED TRAFFIC
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-meta">
+            <span class="kpi-label">Unique Client Nodes</span>
+            <span class="badge badge-cyan">SALTED HASH</span>
+          </div>
+          <div class="kpi-value" id="stat-unique">—</div>
+          <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-tertiary); margin-top: 0.5rem;">
+            ANONYMIZED VISITORS
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-meta">
+            <span class="kpi-label">Peak Route Velocity</span>
+            <span class="badge badge-warning">TOP TIER</span>
+          </div>
+          <div class="kpi-value" id="stat-top-clicks">—</div>
+          <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-tertiary); margin-top: 0.5rem;">
+            MAX CLICKS ON SINGLE LINK
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Overview Chart -->
+      <div class="chart-module" style="margin-bottom: 2rem;">
+        <div class="chart-header">
+          <div class="chart-title">
+            <i class="fas fa-chart-area"></i>
+            <span>Click Velocity Over Time (Last 30 Days)</span>
+          </div>
+          <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-tertiary);">
+            UPDATED: <span id="last-updated" style="color: var(--text-secondary);">—</span>
+          </div>
+        </div>
+        <div class="chart-stage">
+          <canvas id="chart-clicks-over-time"></canvas>
+        </div>
+      </div>
+
+      <!-- Two-Column Split: Top Performing Links & Recent Stream -->
+      <div class="charts-layout">
+        
+        <!-- Top Links Panel -->
+        <div class="chart-module">
+          <div class="chart-header">
+            <div class="chart-title">
+              <i class="fas fa-fire"></i>
+              <span>High-Velocity Routes</span>
+            </div>
+            <span class="badge badge-accent">SORTED BY VOLUME</span>
+          </div>
+          <div id="top-links-list">
+            <p style="color: var(--text-tertiary); font-family: var(--font-mono); font-size: 0.85rem;">
+              Syncing telemetry stream...
+            </p>
+          </div>
+        </div>
+
+        <!-- Recent Ingestion Activity -->
+        <div class="chart-module">
+          <div class="chart-header">
+            <div class="chart-title">
+              <i class="fas fa-stream"></i>
+              <span>Live Ingestion Telemetry</span>
+            </div>
+            <span class="badge badge-success">REAL-TIME</span>
+          </div>
+          <div id="recent-activity">
+            <p style="color: var(--text-tertiary); font-family: var(--font-mono); font-size: 0.85rem;">
+              Listening for dispatch events...
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ══ SECTION 2: ROUTE INVENTORY ════════════════════════════ -->
+    <div id="section-links" style="display: none;">
+      
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <div class="key-terminal" style="min-width: 260px;">
+          <i class="fas fa-search" style="color: var(--text-tertiary);"></i>
+          <input
+            type="text"
+            id="search-input"
+            placeholder="Search slugs or destinations..."
+            oninput="searchLinks(this.value)"
+            aria-label="Filter links"
+          />
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-tertiary);">SORT:</span>
+          <select id="sort-select" class="form-input" style="width: auto; padding: 0.45rem 0.85rem;" onchange="loadLinks()">
+            <option value="-createdAt">Newest First</option>
+            <option value="createdAt">Oldest First</option>
+            <option value="-clicks">Most Clicks</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Links Inventory Table -->
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Short Route</th>
+              <th>Destination URI</th>
+              <th>Clicks</th>
+              <th>Status</th>
+              <th>Timestamp</th>
+              <th>Telemetry Actions</th>
+            </tr>
+          </thead>
+          <tbody id="links-table-body">
+            <tr>
+              <td colspan="6" style="text-align: center; color: var(--text-tertiary); font-family: var(--font-mono); padding: 2rem;">
+                Syncing route inventory...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div id="pagination" style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 1.5rem;"></div>
+
+    </div>
+
+    <!-- ══ SECTION 3: DEEP ANALYTICS INSPECTOR ═══════════════════ -->
+    <div id="section-analytics" style="display: none;">
+      
+      <!-- Target Slug Selector & Period Filter -->
+      <div class="chart-module" style="margin-bottom: 2rem;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+          <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+            <div class="key-terminal" style="width: 240px;">
+              <i class="fas fa-crosshairs"></i>
+              <input type="text" id="analytics-code" placeholder="Enter short slug..." aria-label="Short Slug" />
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="loadAnalytics()">
+              <i class="fas fa-search"></i> Inspect Telemetry
+            </button>
+          </div>
+
+          <div style="display: flex; gap: 0.4rem;">
+            <button class="btn btn-secondary btn-sm period-btn active" onclick="setPeriod(7, this)">7 Days</button>
+            <button class="btn btn-secondary btn-sm period-btn" onclick="setPeriod(30, this)">30 Days</button>
+            <button class="btn btn-secondary btn-sm period-btn" onclick="setPeriod(90, this)">90 Days</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="analytics-panel">
+        
+        <!-- Inspector Summary KPI Strip -->
+        <div class="kpi-ribbon">
+          <div class="kpi-card">
+            <div class="kpi-meta"><span class="kpi-label">Period Dispatches</span></div>
+            <div class="kpi-value" id="a-total-clicks">—</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-meta"><span class="kpi-label">Unique Nodes</span></div>
+            <div class="kpi-value" id="a-unique">—</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-meta"><span class="kpi-label">Crawler Bots</span></div>
+            <div class="kpi-value" id="a-bots">—</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-meta"><span class="kpi-label">All-Time Dispatches</span></div>
+            <div class="kpi-value" id="a-all-time">—</div>
+          </div>
+        </div>
+
+        <!-- Daily Ingestion Line -->
+        <div class="chart-module" style="margin-bottom: 1.5rem;">
+          <div class="chart-header">
+            <div class="chart-title"><i class="fas fa-chart-line"></i> Daily Ingestion Rate</div>
+          </div>
+          <div class="chart-stage">
+            <canvas id="chart-daily"></canvas>
+          </div>
+        </div>
+
+        <!-- Geo & Referrer Breakdown -->
+        <div class="charts-layout">
+          <div class="chart-module">
+            <div class="chart-header">
+              <div class="chart-title"><i class="fas fa-globe"></i> Geographic Ingestion</div>
+              <span class="badge badge-success">MAXMIND OFFLINE</span>
+            </div>
+            <div id="geo-list" class="telemetry-row-list"></div>
+          </div>
+
+          <div class="chart-module">
+            <div class="chart-header">
+              <div class="chart-title"><i class="fas fa-compass"></i> Traffic Attribution (Referrers)</div>
+              <span class="badge badge-cyan">CAMPAIGN SOURCE</span>
+            </div>
+            <div id="referrer-list" class="telemetry-row-list"></div>
+          </div>
+        </div>
+
+        <!-- Hardware & Browser Donut Charts -->
+        <div class="charts-layout">
+          <div class="chart-module">
+            <div class="chart-header">
+              <div class="chart-title"><i class="fas fa-laptop"></i> Hardware Device Tier</div>
+            </div>
+            <div class="chart-stage">
+              <canvas id="chart-devices"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-module">
+            <div class="chart-header">
+              <div class="chart-title"><i class="fas fa-window-maximize"></i> Browser Engine</div>
+            </div>
+            <div class="chart-stage">
+              <canvas id="chart-browsers"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- 24-Hour Velocity Histogram -->
+        <div class="chart-module">
+          <div class="chart-header">
+            <div class="chart-title"><i class="fas fa-clock"></i> 24-Hour Dispatch Velocity</div>
+            <span class="badge badge-accent">HOURLY DISTRIBUTION</span>
+          </div>
+          <div class="chart-stage">
+            <canvas id="chart-hourly"></canvas>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+<!-- ── Micro-Interaction Toast Container ────────────────────── -->
+<div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+<script src="/js/dashboard.js"></script>
+</body>
+</html>
