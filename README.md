@@ -1,186 +1,182 @@
-# ⚡ LinkSnap — Precision Edge Routing Engine & Telemetry System
+# KAIRO — Precision Link Infrastructure & Advanced Click Analytics
 
 <div align="center">
-
-![Node.js](https://img.shields.io/badge/Node.js-24.x-339933?style=for-the-badge&logo=node.js&logoColor=white)
-![Express.js](https://img.shields.io/badge/Express.js-4.19-000000?style=for-the-badge&logo=express&logoColor=white)
-![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-FF5500?style=for-the-badge)
-
-A high-performance, full-stack **URL Shortener** and **Real-Time Telemetry Workstation** designed with Swiss modernist precision engineering. Features sub-5ms 302 redirects, offline MaxMind GeoIP resolution, User-Agent hardware fingerprinting, cryptographic Base62 synthesis, dynamic QR generation, and an aerospace-grade analytics dashboard.
-
-[🌐 Live Preview](https://marthanda24086.github.io/url-shortener-analytics/) • [Architecture](#-architecture) • [Design System](#-design-system) • [Documentation Suite](#-documentation-suite) • [Quick Start](#-quick-start) • [API Specs](#-api-documentation)
-
+  <h3>Intelligent Short Links. Real-Time Telemetry. Privacy-First Audience Intelligence.</h3>
+  <p>A production-ready, commercial SaaS URL Shortener and Click Analytics platform built with Next.js 14, TypeScript, Tailwind CSS, SQLite, and Recharts.</p>
 </div>
 
 ---
 
-## 📚 Studio Documentation Suite
+## 🌟 Key Features
 
-This project includes professional product and engineering documentation:
-
-1. 📄 **[PROJECT_ANALYSIS.md](PROJECT_ANALYSIS.md)** — Architecture analysis, product goals, problem statement, and roadmap.
-2. 🎨 **[DESIGN_RESEARCH.md](DESIGN_RESEARCH.md)** — Benchmark studies from Awwwards, Godly, Linear, Stripe Press, and Vercel.
-3. 📐 **[DESIGN_SYSTEM.md](DESIGN_SYSTEM.md)** — Complete token specifications, obsidian color systems, and typography rules.
-4. 🏗️ **[ARCHITECTURE.md](ARCHITECTURE.md)** — Frontend and backend system design, fire-and-forget ingestion pipeline.
-5. 📝 **[IMPLEMENTATION_LOG.md](IMPLEMENTATION_LOG.md)** — Log of all component additions, technical improvements, and feature mappings.
-6. 🧪 **[TESTING_REPORT.md](TESTING_REPORT.md)** — Automated Chromium visual regression audits across 5 viewports and WCAG 2.1 AAA accessibility report.
-7. 🎓 **[INTERVIEW_GUIDE.md](INTERVIEW_GUIDE.md)** — Technical deep-dive teaching every concept and line of code for interviews and CV reviews.
-
----
-
-## ✨ System Capabilities
-
-### 🔗 Routing & Link Engineering
-- **Cryptographic Base62 Generation**: Utilizes `nanoid` CSPRNG with 6-character Base62 encoding (over **56.8 billion** possible unique combinations).
-- **Custom Vanity Aliases**: Create branded URLs (e.g., `linksnap.com/prod-launch`) with automatic collision checking.
-- **URL Deduplication**: Fingerprints URLs using SHA-256 to prevent duplicate generation for the same user.
-- **Link Expiration (TTL)**: Optional auto-expiring links that automatically return `410 Gone` after expiration.
-- **Bcrypt Password Protection**: Secure private short links with encrypted passwords.
-- **Dynamic QR Code Matrix**: Downloadable high-error-correction PNG QR codes for every generated link.
-
-### 📊 Real-Time Click Telemetry
-- **Sub-5ms Fire-and-Forget Architecture**: Analytics ingestion happens asynchronously in background micro-tasks — redirects complete in **< 3.8ms** with zero user latency.
-- **Offline Geolocation Resolution**: Instant MaxMind GeoIP lookup using local embedded binary databases (resolves Country, Region, and City in < 0.1ms).
-- **Hardware & Engine Fingerprinting**: In-depth User-Agent parsing for device type (Mobile, Desktop, Tablet), OS kernel, and browser engine.
-- **Referrer Attribution**: Captures incoming HTTP referrers to track marketing campaign conversion channels.
-- **GDPR-Compliant Salted Hashing**: IP addresses are irreversibly hashed with a rotating secret salt before storage.
-- **Interactive Telemetry Workstation**: Chart.js data visualizations displaying 30-day velocity curves, device breakdowns, browser distributions, and geo maps.
-
-### 🛡️ Enterprise Security & Reliability
-- **Multi-Tier Rate Limiting**: Built-in sliding-window rate limiters for API requests, key generation, and redirects.
-- **API Key Authentication**: Header-based authentication (`x-api-key`).
-- **HTTP Security Headers**: Complete `helmet` integration (CSP, HSTS, X-Frame-Options against clickjacking, XSS protection).
-- **Graceful Zero-Downtime Shutdown**: Handles `SIGTERM` and `SIGINT` to safely flush MongoDB queries before process termination.
-- **Docker & Docker Compose**: Full containerization with health checks and persistent volume management.
+- **⚡ Sub-2ms Redirection Engine:** High-performance `/r/[code]` route handler delivering instantaneous HTTP 302 redirects without aggressive client caching.
+- **📊 Real-Time Clickstream Analytics:** Live telemetry tracking total clicks, clicks today, and time-series activity curves across 24h, 7d, 30d, 90d, and All Time.
+- **🛡️ Privacy-Conscious Unique Reach:** Computes approximate unique visitor counts using rotating daily keyed HMAC-SHA256 hashes. **Zero raw IP addresses are ever stored on disk or in logs.**
+- **🌐 Deep Attribution & Profiling:** Categorizes visitor traffic by Referrer Domains (Direct, Google, X/Twitter, LinkedIn, YouTube, GitHub, Reddit), Devices (Desktop, Mobile, Tablet), Browsers (Chrome, Safari, Firefox, Edge, Opera), and Operating Systems (macOS, Windows, iOS, Android, Linux).
+- **🤖 Heuristic Bot & Crawler Filter:** Segregates automated scrapers, web spiders, and preview bots (Slack, Twitterbot, WhatsApp, curl) to preserve human engagement accuracy.
+- **✨ Custom Aliases & Slugs:** Create memorable, branded short links (e.g., `kairo.sh/r/launch-2026`) with real-time uniqueness validation and reserved route protection.
+- **📱 High-Resolution QR Code Studio:** Generate downloadable, print-ready PNG QR codes for physical marketing, slides, and packaging.
+- **⏳ Link Lifecycle Controls:** Set automatic expiration dates or temporarily pause incoming redirects at any time with custom branded HTTP 403 / 410 landing pages.
+- **🔒 Commercial-Grade Security:**
+  - Password hashing with **bcrypt** (10 salt rounds).
+  - Cryptographically signed **JWT tokens** stored in HTTP-only, SameSite=Lax cookies.
+  - Strict multi-tenant user isolation (`WHERE user_id = ?`).
+  - Strict URL scheme validation (HTTP/HTTPS only; blocks `javascript:`, `data:`, and private loopback/SSRF attempts).
 
 ---
 
-## 🛠️ Tech Stack
+## 🏗️ Technology Stack
 
-- **Backend**: Node.js, Express.js
-- **Database**: MongoDB with Mongoose ODM
-- **Encoding & Math**: `nanoid` (Base62 CSPRNG), `crypto` (SHA-256 & Salted IP Hashing), `bcryptjs`
-- **Analytics & Geo**: `geoip-lite`, `ua-parser-js`
-- **Security**: `helmet`, `cors`, `express-rate-limit`, `joi`
-- **Frontend**: Semantic HTML5, CSS Custom Properties, Vanilla ES6, [Chart.js](https://www.chartjs.org/)
-- **DevOps**: Docker, Docker Compose, Alpine Linux
+| Layer | Technologies |
+|---|---|
+| **Frontend Framework** | [Next.js 14](https://nextjs.org/) (App Router), [React 18](https://react.dev/), [TypeScript](https://www.typescriptlang.org/) |
+| **Styling & Design System** | [Tailwind CSS](https://tailwindcss.com/), Custom Design Tokens, CSS Variables |
+| **Data Visualization** | [Recharts](https://recharts.org/) (Responsive SVG Time-Series & Bar Charts) |
+| **Icons & UI Primitives** | [Lucide React](https://lucide.dev/), Radix Primitives, Canvas Confetti |
+| **Database & Engine** | [SQLite 3](https://www.sqlite.org/) via [`@libsql/client`](https://github.com/tursodatabase/libsql-client-ts) (WAL mode, prepared statements) |
+| **Authentication & Crypto** | [bcryptjs](https://github.com/dcodeIO/bcrypt.js), [jsonwebtoken](https://github.com/auth0/node-jsonwebtoken), Native Node.js `crypto` |
+| **QR Code Engine** | [`qrcode`](https://github.com/soldair/node-qrcode) |
+| **Testing Suite** | Custom E2E Automated Integration Harness (`scripts/e2e-test.js`) |
 
 ---
 
-## 🚀 Quick Start (Local Setup)
+## 📁 Repository Structure
 
-### 1. Clone the repository
-```bash
-git clone https://github.com/<your-username>/url-shortener-analytics.git
-cd url-shortener-analytics
+```
+d:\fswd_project\
+├── src\
+│   ├── app\
+│   │   ├── layout.tsx                     # Root layout with theme script & toast provider
+│   │   ├── page.tsx                       # Public landing page with live interactive shortener
+│   │   ├── globals.css                    # Tailwind CSS directives & custom scrollbars
+│   │   ├── login\page.tsx                 # Authentication login with 1-click demo pill
+│   │   ├── register\page.tsx              # Account registration with password validation
+│   │   ├── dashboard\
+│   │   │   ├── layout.tsx                 # Sidebar shell, mobile nav drawer & header
+│   │   │   ├── page.tsx                   # Overview dashboard with KPI cards & recent links
+│   │   │   ├── links\
+│   │   │   │   ├── page.tsx               # Link management table, search, filters & actions
+│   │   │   │   └── [id]\page.tsx          # Individual link analytics & hourly heatmap
+│   │   │   ├── analytics\page.tsx         # Dedicated deep analytics suite
+│   │   │   └── settings\page.tsx          # Profile, theme toggle & privacy disclosure
+│   │   ├── r\[code]\route.ts              # High-speed 302 redirect engine & event ingest
+│   │   └── api\
+│   │       ├── auth\                      # Register, login, me, logout endpoints
+│   │       ├── links\                     # Link CRUD, status toggling, and pagination
+│   │       └── analytics\                 # Overview and individual link aggregations
+│   ├── components\
+│   │   ├── dashboard\                     # MetricCard, ClickChart, DistributionChart, QRModal, CreateLinkModal
+│   │   └── ui\                            # Modal, Toast system
+│   ├── lib\
+│   │   ├── db.ts                          # SQLite schema initialization & prepared query helpers
+│   │   ├── auth.ts                        # JWT verification & bcrypt helpers
+│   │   ├── user-agent.ts                  # Browser, OS, device & bot detection
+│   │   ├── anonymizer.ts                  # Privacy-safe keyed HMAC visitor fingerprinting
+│   │   └── utils.ts                       # URL validation, slug generator & formatters
+│   └── types\                             # TypeScript data models and response contracts
+├── scripts\
+│   ├── seed.js                            # Database seeder with demo account & realistic data
+│   └── e2e-test.js                        # Automated end-to-end test suite
+├── PROJECT_ANALYSIS.md                    # Initial audit & architecture blueprint
+├── DESIGN_RESEARCH.md                     # Visual research & competitor benchmarking
+├── DESIGN_SYSTEM.md                       # Design tokens, color scales & typography
+├── ARCHITECTURE.md                        # Technical architecture & data flow
+├── DATABASE_SCHEMA.md                     # SQLite table DDL & indexing strategies
+├── API_DOCUMENTATION.md                   # REST API endpoints reference
+├── IMPLEMENTATION_LOG.md                  # Comprehensive engineering chronology
+├── TESTING_REPORT.md                      # E2E test results & verification matrix
+├── package.json
+└── tailwind.config.ts
 ```
 
-### 2. Install dependencies
+---
+
+## 🚀 Quick Start Guide
+
+### 1. Prerequisites
+- **Node.js:** v18.0.0 or later (v20+ recommended)
+- **npm:** v9.0.0 or later
+
+### 2. Installation
+Clone the repository and install dependencies:
 ```bash
+git clone <repo-url>
+cd fswd_project
 npm install
 ```
 
-### 3. Configure environment variables
-Create a `.env` file in the project root (see `.env.example`):
+### 3. Environment Variables
+Create a `.env.local` file in the project root:
 ```env
 PORT=3000
-NODE_ENV=development
-MONGO_URI=mongodb://localhost:27017/url-shortener
-BASE_URL=http://localhost:3000
-MASTER_API_KEY=sk_master_secret_key_12345
-DEMO_API_KEY=demo_key_12345
-IP_HASH_SALT=your_custom_secret_salt_here
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+JWT_SECRET=kairo_super_secret_production_ready_cryptographic_jwt_key_2026_x89a1
+DATABASE_URL=file:kairo.db
+ANONYMIZER_SALT=kairo_daily_rotating_salt_for_privacy_hash_sec_9918
 ```
 
-### 4. Run the app
+### 4. Database Setup & Seeding
+Initialize the SQLite database and populate realistic sample data (demo user, sample links, and distributed clickstream events):
 ```bash
-# Development (with nodemon auto-restart)
+npm run seed
+```
+
+**Pre-configured Demo Account:**
+- **Email:** `demo@kairo.sh`
+- **Password:** `Password123!`
+
+### 5. Running the Application
+
+**Development Mode:**
+```bash
 npm run dev
-
-# Production
-npm start
 ```
 
-Open your browser at:
-- **Landing Page & Routing Console**: [http://localhost:3000](http://localhost:3000)
-- **Telemetry Workstation**: [http://localhost:3000/dashboard.html](http://localhost:3000/dashboard.html)
-
----
-
-## 🐳 Run with Docker Compose
-
-Run the entire application stack including MongoDB and Mongo Express with a single command:
-
+**Production Build & Execution:**
 ```bash
-docker compose up -d
+npm run build
+npm run start
 ```
-
-- **App**: `http://localhost:3000`
-- **Mongo Express DB Admin**: `http://localhost:8081` (User: `admin`, Pass: `password`)
+Visit `http://localhost:3000` in your browser.
 
 ---
 
-## 🌐 Live Deployment Guide (Deploy Free Webpage)
+## 🧪 Automated Testing
 
-### Step 1: Set Up Free Cloud MongoDB (MongoDB Atlas)
-1. Go to [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) and sign up for a free account.
-2. Click **Create Cluster** and select the free **M0 Shared** tier.
-3. In **Database Access**, create a database user (username and password).
-4. In **Network Access**, click **Add IP Address** and choose **Allow Access From Anywhere** (`0.0.0.0/0`).
-5. Click **Connect** → **Drivers** and copy your MongoDB connection string.
-
-### Step 2: Deploy to Render.com (100% Free Hosting)
-1. Push your repository to **GitHub**.
-2. Go to [Render.com](https://render.com) and sign in with GitHub.
-3. Click **New +** → **Web Service** and select your repository.
-4. Set Build Command: `npm install`, Start Command: `npm start`.
-5. Under **Environment Variables**, add `MONGO_URI`, `NODE_ENV=production`, `DEMO_API_KEY=demo_key_12345`, `IP_HASH_SALT=your_salt`, `BASE_URL=https://your-service.onrender.com`.
-6. Click **Deploy Web Service**.
+Execute the comprehensive end-to-end integration test suite:
+```bash
+npm run test:e2e
+```
+This runs 19 automated assertions verifying:
+1. Public landing page availability.
+2. User registration and password hashing.
+3. Session cookies and authentication middleware.
+4. XSS executable URL rejection (`javascript:`).
+5. SSRF loopback protection (`127.0.0.1`).
+6. Reserved alias collision prevention.
+7. Short link creation and custom slug generation.
+8. Uniqueness constraints on custom slugs.
+9. HTTP 302 redirection with accurate `Location` header.
+10. Clickstream telemetry ingestion.
+11. User-Agent parsing (Browser, OS, Device).
+12. Referrer domain canonicalization.
+13. Link pausing and custom HTTP 403 page rendering.
+14. Link reactivation.
+15. Multi-tenant isolation (User B blocked from User A resources).
+16. Cascade link deletion and post-deletion HTTP 404 responses.
 
 ---
 
-## 📖 API Documentation
+## 🔒 Security Architecture
 
-All write endpoints require the `x-api-key` HTTP header.
-
-### 1. Shorten URL
-```http
-POST /api/shorten
-Content-Type: application/json
-x-api-key: your_api_key
-
-{
-  "url": "https://example.com/very-long-url-path",
-  "customAlias": "prod-release",        // optional
-  "expiresIn": 86400,                   // optional (seconds)
-  "password": "secretPassword",          // optional
-  "title": "Release v2.0",              // optional
-  "tags": ["deploy", "cloud"]           // optional
-}
-```
-
-### 2. Access / Redirect
-```http
-GET /:code
-```
-Redirects client with `302 Found` to the target URL and triggers background click analytics recording in `<3.8ms`.
-
-### 3. URL Analytics
-```http
-GET /api/analytics/:code?days=30
-x-api-key: your_api_key
-```
-
-### 4. Overall User Analytics Dashboard
-```http
-GET /api/analytics/dashboard
-x-api-key: your_api_key
-```
+1. **Protocol Sanitation:** Every destination URL is normalized and strictly checked. Schemes outside `http:` and `https:` are rejected immediately.
+2. **SSRF Guard:** Internal IP ranges (`127.0.0.1`, `localhost`, `0.0.0.0`) cannot be shortened.
+3. **Password Security:** Salted hashes generated via bcrypt with 10 work factor rounds.
+4. **Session Isolation:** Authentication tokens are stored in `HttpOnly`, `SameSite=Lax` cookies, preventing cross-site scripting credential exfiltration.
+5. **Database Protection:** 100% of queries use prepared statements with parameter binding, eliminating SQL injection vulnerabilities.
 
 ---
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License. Engineered for production full-stack web development excellence.

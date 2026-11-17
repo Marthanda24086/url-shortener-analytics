@@ -1,64 +1,85 @@
-# LinkSnap — Comprehensive Project Discovery & Analysis
+# KAIRO — Project Discovery & Architecture Analysis
 
-**Document Status:** Complete Architecture & Product Discovery  
-**Author:** Elite Autonomous Product Development Studio  
-**Date:** November 2026
-
----
-
-## 1. Executive Product Overview
-
-**LinkSnap** is a production-grade, enterprise-ready URL Shortener and Real-Time Click Telemetry Engine built on Node.js, Express, and MongoDB.
-
-### Core Problem It Solves
-1. **Redirect Latency:** Standard URL redirect services introduce 100ms–300ms of middleware latency, hurting user retention and SEO performance. LinkSnap achieves **sub-5ms mean redirect times** through in-memory routing, compound B-tree indexing, and an un-awaited asynchronous "fire-and-forget" telemetry pattern.
-2. **Privacy & Regulatory Compliance (GDPR/ePrivacy):** Most analytics platforms store raw IP addresses and intrusive tracking cookies. LinkSnap uses **salted SHA-256 IP anonymization** and **offline GeoIP binary database resolution** (MaxMind), providing deep geographic attribution without ever persisting Personally Identifiable Information (PII).
-3. **Link Security & Lifecycle Control:** Includes optional **bcrypt password protection** for private endpoints and **TTL link expiration** returning clean `410 Gone` status codes upon expiration.
+**Project Name:** KAIRO (Precision Link Infrastructure & Advanced Click Analytics)  
+**Workspace:** `d:\fswd_project`  
+**Date:** November 2026  
+**Status:** Initial Discovery & Architectural Blueprint  
 
 ---
 
-## 2. Technical Architecture & Data Models
+## 1. Executive Summary
 
-### Backend Architecture
-```
-Client Request
-  ├── Helmet (HSTS, CSP, X-Frame-Options against clickjacking)
-  ├── CORS (Configurable origin validation)
-  ├── express.json({ limit: '10kb' }) (JSON bomb prevention)
-  ├── Rate Limiters (apiLimiter, strictLimiter, redirectLimiter)
-  └── Routing Engine:
-       ├── /api/*          -> Controller operations (Joi validated)
-       │                       ├── /shorten (POST)
-       │                       ├── /urls (GET, DELETE)
-       │                       └── /analytics (GET)
-       └── /:code          -> Sub-5ms 302 Redirect Handler
-                               ├── B-tree query (Url model)
-                               ├── Fast HTTP 302 dispatch
-                               └── Async Background Task (Click model + $inc)
-```
-
-### Data Layer
-- **`Url` Collection:** Stores metadata, original destination, short code, custom alias, title, tags, password hash (bcrypt), QR code data URL, active status, and click counter.
-- **`Click` Collection:** High-volume event stream indexed on `{ shortCode: 1, clickedAt: -1 }`. Captures device hardware tier, OS, browser engine, country/region (offline GeoIP), referrer URI, and salted IP hash.
+Kairo is a production-grade, full-stack link shortening and visitor intelligence platform built for modern developers, marketing teams, and content creators. It bridges high-throughput URL redirection with deep, privacy-conscious clickstream analytics, device fingerprinting, and rich link management.
 
 ---
 
-## 3. Current User Interface & Technical Weaknesses Identified
+## 2. Existing Workspace Audit
 
-| Domain | Prior Weakness | Required Studio Elevation |
-| :--- | :--- | :--- |
-| **Hero Concept** | Generic centered heading with purple/indigo AI template styling | Asymmetric command console with live ingestion telemetry, real-time metrics, and tactile URL workbench |
-| **Motion & Physics** | Static HTML with basic CSS transitions | Purposeful kinetic motion: GSAP timeline reveals, canvas particle telemetry stream, tactile button states |
-| **Developer Experience** | Static code block | Interactive, runnable multi-language API terminal (cURL, Fetch, Python) with real-time syntax highlighting |
-| **Dashboard Workstation** | Generic dashboard cards with empty charts on disconnect | Aerospace telemetry workstation with customizable Chart.js themes, responsive sub-navigation pills, and resilient fallback states |
-| **Accessibility** | Basic contrast ratios, missing explicit ARIA roles | Full WCAG 2.1 AAA/AA conformance, visible high-contrast focus rings, screen-reader live regions |
+- **Directory State:** `d:\fswd_project` was audited and found to be completely clean and unpopulated.
+- **Mandated Stack:** No legacy or predetermined framework constraints exist in the workspace.
+- **Available Runtimes & Tooling:**
+  - Node.js LTS (v24/v26 via winget installer).
+  - Modern npm / package ecosystem.
+  - Windows 11 host with PowerShell shell environment.
+  - Playwright / Chromium headless browser integration for end-to-end verification.
 
 ---
 
-## 4. Target User Experience & Implementation Roadmap
+## 3. Technology Stack Selection
 
-1. **Phase 2 (Design Research):** Study 5+ benchmark digital design platforms (Awwwards, Godly, Land-book, Refero, Dribbble) for typographic rhythm, asymmetric compositions, and technical telemetry aesthetics.
-2. **Phase 3 (Design System):** Consolidate comprehensive tokens (`--bg-void`, `--accent-signal`, `--font-mono`, hairline borders, elevation shadows).
-3. **Phase 5 & 6 (Frontend Implementation):** Build high-precision UI with Three.js / Canvas telemetry visualization, smooth interactive workbench, and responsive workstation.
-4. **Phase 7 & 8 (Motion & Responsiveness):** Refine animations across 1920px, 1440px, 1024px, 768px, and 390px viewports.
-5. **Phase 9–14 (QA & Delivery):** Complete accessibility testing, performance optimization, and project documentation.
+To achieve maximum performance, type safety, modularity, and a stunning SaaS user interface, the application is structured with a unified full-stack TypeScript architecture:
+
+### Frontend Layer
+- **Framework:** Next.js 14 / React 18+ (App Router) or Vite + React with Express API. A unified Next.js App Router provides seamless server-side routing, ultra-fast 302 redirects, SSR/SSG for marketing pages, API routes with robust middleware, and zero-latency client state management.
+- **Styling:** Tailwind CSS with custom design tokens, micro-gradients, hairline borders, and CSS variables.
+- **Component Primitives:** Lucide React icons, Radix UI primitives, Recharts for responsive SVG analytics, Canvas-Confetti for reward moments, and QRCode generation library (`qrcode`).
+- **Motion & Interactions:** Framer Motion for entrance reveals, tab transitions, modal overlays, and toast microinteractions.
+
+### Backend & API Layer
+- **API Runtime:** Next.js Route Handlers / REST API endpoints with robust parameter sanitization, rate limiting, and HTTP-only cookie session handling.
+- **Authentication:** Stateless, cryptographically secure JWT tokens stored in HTTP-only cookies + bcrypt password hashing. Complete user isolation enforced at the database query level.
+- **URL Engine:**
+  - Cryptographically secure short code generation (`nanoid` custom alphabet base62).
+  - Collision detection with automated retry loop.
+  - Custom alias validation rejecting reserved system routes (`/api`, `/dashboard`, `/login`, `/signup`, `/settings`, etc.).
+  - Protocol sanitizer enforcing `http://` and `https://` only (blocking `javascript:`, `data:`, `file:`, internal loopback SSRF attempts).
+  - High-performance HTTP 302 redirects without aggressive client-side caching.
+
+### Database Layer
+- **Database Engine:** SQLite via `better-sqlite3` or Prisma / Drizzle ORM. SQLite provides high write-throughput, zero external network latency, full ACID compliance, and effortless portable zero-config reproducibility.
+- **Schema Entities:**
+  1. `users` (id, name, email, password_hash, created_at, updated_at)
+  2. `links` (id, user_id, original_url, short_code, title, is_active, expires_at, created_at, updated_at)
+  3. `click_events` (id, link_id, timestamp, referrer_domain, browser, os, device_type, country_code, visitor_hash, is_bot)
+- **Indexes:**
+  - Unique index on `links.short_code`
+  - Foreign key index on `links.user_id`
+  - Composite indexes on `click_events(link_id, timestamp)`
+  - Index on `click_events.visitor_hash` for unique visitor deduplication.
+
+### Analytics & Intelligence Pipeline
+- **User-Agent Parser:** Fast regex-based parser categorizing Browser (Chrome, Safari, Firefox, Edge, Opera, Other), OS (macOS, Windows, iOS, Android, Linux, Other), Device (Mobile, Desktop, Tablet), and Bot heuristic flags.
+- **Privacy-Preserving Visitor Identification:** One-way HMAC-SHA256 hash using a rotating daily server secret combined with client subnet and user agent. Never stores raw IP addresses.
+- **Bot & Crawler Filter:** Evaluates User-Agent against known crawler signatures (Googlebot, Bingbot, Twitterbot, WhatsApp, curl, python-requests) to segregate human engagement from automated scrapers.
+- **Aggregation Dimensions:**
+  - Time-series trends (24h, 7d, 30d, 90d, All Time).
+  - Referrer domains (Direct, Google, X/Twitter, LinkedIn, YouTube, GitHub, Custom).
+  - Device distribution (Desktop vs Mobile vs Tablet).
+  - Browser & OS share.
+  - Peak hours heatmap (0-23 UTC/local).
+
+---
+
+## 4. Implementation Phasing Plan
+
+| Phase | Milestone | Deliverable |
+|---|---|---|
+| **Phase 0-1** | Discovery & Audit | `PROJECT_ANALYSIS.md` & workspace environment setup |
+| **Phase 2-3** | Brand & Design Research | `DESIGN_RESEARCH.md` & `DESIGN_SYSTEM.md` |
+| **Phase 4** | Public Landing Page | Hero with interactive shortener, live preview, features, how it works, pricing/specs, footer |
+| **Phase 5** | Authentication System | Sign up, Log in, Logout, Protected Route Middleware, Password Hashing |
+| **Phase 6-11** | Core Application | Dashboard Overview, Link Manager, Shortener Engine, Analytics Engine, Link Detail View, QR Code Engine |
+| **Phase 12-15** | Security & Settings | Account Settings, URL sanitization, Anti-abuse, Privacy documentation |
+| **Phase 16-19** | Design Polish & Responsive | Framer motion, tablet/mobile layout audits, accessibility, SEO |
+| **Phase 20-21** | E2E Browser Testing & Refinement | Playwright / Browser test script, 3 rounds of visual improvements |
+| **Phase 22** | Final Documentation | Comprehensive technical documentation and user guides |

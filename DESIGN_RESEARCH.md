@@ -1,73 +1,76 @@
-# LinkSnap — Professional Design Research & Benchmark Analysis
+# KAIRO — Design Research & Visual Language Specification
 
-**Document Status:** Approved Design References  
-**Research Directorate:** Senior Creative Director & Lead Interaction Designer  
-**Date:** November 2026
-
----
-
-## Benchmark References & Architectural Inspirations
-
-### Reference 1: Linear.app // Streamlined Issue Tracking & Telemetry
-- **Platform Reference:** [Godly / Land-book Showcase](https://godly.website/website/linear)
-- **Key Design Excellence:**
-  - Obsidian dark foundation with razor-sharp 1px hairline dividers (`rgba(255, 255, 255, 0.08)`).
-  - Asymmetric, keyboard-centric interface hierarchy where speed is communicated through visual restraint.
-  - Tabular typography for IDs, status indicators, and time deltas using custom monospaced numbers.
-- **Application to LinkSnap:**
-  - The **Routing Workbench** in our hero section adopts Linear's tactile command input design: shortcut hints (`Cmd + K`), instant input feedback, and tight button radiuses (`6px - 8px`).
+**Brand Identity:** KAIRO  
+**Aesthetic Direction:** Modern Minimalist Architectural SaaS (Warm Charcoal & Luminous Indigo)  
+**Primary References Studied:** Dub.co, Linear.app, Stripe Radar, Raycast, Vercel Analytics, Short.io  
 
 ---
 
-### Reference 2: Stripe Press // Precision Editorial & Physical Artifacts
-- **Platform Reference:** [Awwwards Site of the Month](https://www.awwwards.com/sites/stripe-press)
-- **Key Design Excellence:**
-  - High typographic tension between architectural display type and technical annotations.
-  - Use of high-contrast signal colors (Signal Orange / Amber) against deep matte dark backgrounds.
-  - Asymmetric editorial layout where content is anchored on the left and interactive artifacts float on the right.
-- **Application to LinkSnap:**
-  - Replaces generic centered hero sections with an asymmetric editorial grid: headline and telemetry on the left, tactile engine console on the right.
+## 1. Competitor & Industry Benchmark Analysis
+
+### Dub.co
+- **Strengths:** Clean card layout, instantaneous link creation modal, domain-level management, rich geo/device breakdowns, crisp QR code downloads.
+- **Learnings for Kairo:** Avoid cluttered multi-column overloads on the overview page. Keep the URL creation bar prominent and persistent with instantaneous clipboard feedback.
+
+### Linear.app & Raycast
+- **Strengths:** World-class keyboard ergonomics, subtle borders (`border-white/10` or `border-zinc-200`), dark & warm light modes with high readability, muted secondary labels (`text-zinc-500`), tactile hover states.
+- **Learnings for Kairo:** Use subtle hairline border dividers, high contrast primary actions, and elegant badges for link status (Active, Paused, Expired).
+
+### Stripe & Vercel Analytics
+- **Strengths:** Smooth SVG sparklines, custom interactive tooltips showing timestamp and exact click count, intuitive date-range pills (24h, 7d, 30d, 90d, All), clear metric deltas.
+- **Learnings for Kairo:** Present both high-level aggregates (Total Clicks, Unique Visitors, Active Links) and granular drill-downs (Referrers, OS, Browsers, Devices) without overwhelming the user.
 
 ---
 
-### Reference 3: Vercel // Edge Network & Real-Time Observability
-- **Platform Reference:** [Land-book Featured Showcase](https://land-book.com/sites/vercel)
-- **Key Design Excellence:**
-  - Hardware-like blueprint aesthetic with subtle background hairline grid systems.
-  - Interactive pipeline flow diagrams that visually demonstrate edge routing, caching, and serverless functions without decorative clutter.
-  - Tabbed developer terminal with multi-language code snippets (`cURL`, `Node.js`, `Python`).
-- **Application to LinkSnap:**
-  - Our **Sub-5ms Atomic Routing Engine** wireframe directly draws from this approach: showing step-by-step dispatch (`Client GET` -> `Indexed B-Tree Resolve` -> `302 Found Dispatch`).
+## 2. Brand Identity & Personality
+
+- **Name:** **KAIRO** (derived from *Kairos* — the opportune, precise moment in Greek philosophy).
+- **Core Values:** Precision, Speed, Data Integrity, Privacy-First Intelligence.
+- **Tone of Voice:** Engineered, confident, concise, transparent.
+- **Logo Design:** A geometric monogram fusing two intersecting link nodes with a directional forward arrow, symbolizing instantaneous redirection and telemetry.
 
 ---
 
-### Reference 4: Raycast // Keyboard-Driven Desktop Instrument
-- **Platform Reference:** [Refero Design Systems](https://refero.design/tools/raycast)
-- **Key Design Excellence:**
-  - Monochromatic sophistication accented by sharp telemetry status dots (Emerald `#00F59B` for operational, Amber `#FF5500` for active triggers).
-  - High-density data tables with monospaced metrics, clear visual hierarchy, and accessible hover actions.
-- **Application to LinkSnap:**
-  - The **Route Inventory Table** and **Telemetry Workstation** incorporate Raycast's compact high-density layout, keyboard shortcuts, and clean action icon trays.
+## 3. Visual System & Color Direction
+
+Kairo adopts a dual-mode high-clarity color palette designed to avoid generic saturated neon gradients:
+
+### Light Mode (Primary Default)
+- **Background Root:** `#FAFAFA` (Crisp stone white)
+- **Surface Elevation 1 (Cards, Sidebar):** `#FFFFFF` (Pure white)
+- **Surface Elevation 2 (Input fields, hover):** `#F4F4F5` (Subtle neutral zinc)
+- **Borders & Dividers:** `#E4E4E7` (Hairline zinc-200)
+- **Primary Text:** `#09090B` (Deep obsidian ink)
+- **Secondary Text:** `#71717A` (Muted zinc-500)
+- **Accent Primary:** `#2563EB` (Precision Royal Cobalt)
+- **Accent Hover:** `#1D4ED8`
+- **Accent Secondary / Success:** `#059669` (Emerald 600)
+- **Warning / Paused:** `#D97706` (Amber 600)
+- **Destructive / Expired:** `#DC2626` (Rose/Red 600)
+
+### Dark Mode (Night Mode Option)
+- **Background Root:** `#09090B` (Obsidian zinc)
+- **Surface Elevation 1:** `#18181B` (Zinc-900)
+- **Surface Elevation 2:** `#27272A` (Zinc-800)
+- **Borders & Dividers:** `#27272A`
+- **Primary Text:** `#FAFAFA`
+- **Secondary Text:** `#A1A1AA`
+- **Accent Primary:** `#3B82F6`
 
 ---
 
-### Reference 5: Resend // Modern Transactional Engine
-- **Platform Reference:** [Godly Minimalist Category](https://godly.website/website/resend)
-- **Key Design Excellence:**
-  - Zero decorative fluff. The entire product speaks through its API documentation, real-time event logs, and precision typography.
-  - Fast, immediate visual feedback when interacting with forms, API tokens, and copy-to-clipboard interactions.
-- **Application to LinkSnap:**
-  - Informs our **Interactive REST Terminal** and copy feedback micro-interactions (instant visual feedback with morphing icons and progress toasts).
+## 4. Typography System
+
+- **Display & Headings:** `Inter`, `-apple-system`, `BlinkMacSystemFont`, `Segoe UI`, sans-serif with tight tracking (`tracking-tight`), `font-semibold` / `font-bold`.
+- **Body & Data:** `Inter` with relaxed line-height for effortless reading.
+- **Mono (Short codes, URLs, hashes, timestamps):** `JetBrains Mono`, `ui-monospace`, `SFMono-Regular`, `Menlo`, monospace with medium weights.
 
 ---
 
-## Design Synthesis: The LinkSnap Identity Matrix
+## 5. UI Components & Layout Principles
 
-```
-[ Precision Engineering ]  +  [ Swiss Modernism ]  +  [ Real-Time Telemetry ]
-          │                           │                           │
-          ▼                           ▼                           ▼
-- High-contrast obsidian      - Strict typographic        - Live status pulses
-- Hairline architectural grid   scale & tabular mono      - Particle wave canvas
-- Signal Amber (#FF5500)      - Asymmetric layout balance - <3.8ms latency gauges
-```
+1. **Persistent Top Bar / Header:** Fast search, quick "New Link" button, notification bell, user profile dropdown with theme switcher.
+2. **Modular Dashboard Grid:** Responsive 4-metric KPI row with trend badges, followed by the primary interactive Click Activity time-series graph, followed by side-by-side Top Referrers and Device Split cards.
+3. **Link Management Table:** Clean list view with original URL truncation, one-click copy badge, quick action menu (Edit, QR, Pause/Resume, Delete), and live click counter badge.
+4. **Interactive URL Shortener Modal / Bar:** Floating card with validation feedback, custom alias input with live preview (`kairo.sh/your-slug`), and optional expiration date picker.
+5. **Toast Notification System:** Instant feedback for link copying ("Copied to clipboard!"), creation, updates, and deletion with smooth slide-in animations.

@@ -1,26 +1,40 @@
 # Dependencies
-node_modules/
-package-lock.json
+/node_modules
+/.pnp
+.pnp.js
 
-# Environment variables
+# Testing
+/coverage
+
+# Next.js build output
+/.next/
+/out/
+
+# Production
+/build
+/dist
+
+# SQLite local database files
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Environment files
+.env*.local
 .env
-.env.local
-.env.*.local
-.env.production
 
-# Logs
-*.log
+# Debug logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.pnpm-debug.log*
 
-# OS and Editor
+# System files
 .DS_Store
 Thumbs.db
+*.pem
+
+# Editor directories
 .vscode/
 .idea/
-
-# Testing & Coverage
-coverage/
-.nyc_output/
-dist/

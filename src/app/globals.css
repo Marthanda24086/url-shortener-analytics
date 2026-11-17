@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #090909;
+    --foreground: #F5F5F5;
+    --card: #151515;
+    --surface: #1D1D1D;
+    --border: #303030;
+    --muted: #A1A1AA;
+    --accent: #FF6B2C;
+    --accent-hover: #E55A1F;
+    --accent-secondary: #FF8C42;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    selection-background-color: rgba(255, 107, 44, 0.3);
+    selection-color: #FFFFFF;
+  }
+
+  ::selection {
+    background: rgba(255, 107, 44, 0.35);
+    color: #FFFFFF;
+  }
+}
+
+/* Precision dark scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #090909;
+}
+::-webkit-scrollbar-thumb {
+  background: #303030;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #454545;
+}
+
+/* Orange Glow Accents */
+.orange-glow {
+  box-shadow: 0 0 25px -4px rgba(255, 107, 44, 0.28);
+}
+
+.subtle-grid {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+}

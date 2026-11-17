@@ -1,65 +1,105 @@
-# LinkSnap — Frontend & System Architecture Specification
+# KAIRO — Full-Stack Technical Architecture
 
-**Architecture Directorate:** Senior Frontend Architect & Performance Engineer  
-**Date:** November 2026
-
----
-
-## 1. Architectural Strategy & Technology Decision Matrix
-
-### Decision: Semantic HTML5 + Modern CSS Design Tokens + Native ES6 + Canvas Telemetry
-**Rationale:**
-1. **Zero Runtime Bundle Bloat:** Traditional React/Next.js scaffolds for simple utility pages introduce 150KB–300KB of vendor JavaScript before rendering a single byte. By utilizing native modern ES6, CSS Custom Properties, and preconnected fonts, the entire page renders in **< 120ms** with zero client hydration delay.
-2. **Deterministic Browser Compatibility:** All existing backend routes (`server.js`, `src/routes/api.js`, `src/routes/redirect.js`) serve static files directly through `express.static` with custom cache-control headers.
-3. **Resilient Data Binding:** Built-in defensive content-type inspection prevents JSON parsing crashes if MongoDB is disconnected or in cold-boot states.
+**Version:** 1.0.0  
+**Repository Structure, Request Flows, Security & Data Pipelines**
 
 ---
 
-## 2. Directory & Component Organization
+## 1. High-Level System Architecture
+
+```
+                                  [ User Browser ]
+                                         │
+                   ┌─────────────────────┴─────────────────────┐
+                   │                                           │
+          [ Short URL Request ]                       [ App / Dashboard ]
+             (e.g., /r/:code)                       (e.g., /dashboard/*)
+                   │                                           │
+                   ▼                                           ▼
+          [ Edge Route Handler ]                      [ Next.js React UI ]
+                   │                                           │
+       ┌───────────┴───────────┐                     ┌─────────┴─────────┐
+       ▼                       ▼                     ▼                   ▼
+ [ Lookup Slug ]       [ Click Analytics ]      [ Auth API ]       [ Link & Analytics ]
+ (Cache/DB lookup)    (Async Event Log)         (/api/auth/*)         (/api/links/*)
+       │                       │                     │                   │
+       ▼                       ▼                     ▼                   ▼
+ [ 302 Redirect ]     [ IP Anonymizer ]         [ JWT Verification ] [ Aggregation Engine ]
+ (To Destination)     [ User-Agent Parser ]          │                   │
+                      [ Deduplication ]              └─────────┬─────────┘
+                               │                               │
+                               ▼                               ▼
+                      ┌──────────────────────────────────────────────┐
+                      │              SQLite Database                 │
+                      │  (users, links, click_events, analytics_idx) │
+                      └──────────────────────────────────────────────┘
+```
+
+---
+
+## 2. Directory Structure
 
 ```
 d:\fswd_project\
-├── public/
-│   ├── index.html                 # Precision Landing Page & Routing Engine Console
-│   ├── dashboard.html             # High-Density Telemetry Workstation
-│   ├── css/
-│   │   └── style.css              # Master Design System (Tokens, Grid, Bento, Workstation)
-│   └── js/
-│       ├── main.js                # Landing page workbench controller & API terminal
-│       └── dashboard.js           # Workstation telemetry charts, table filters, inspector
-├── src/
-│   ├── app.js                     # Express setup, Helmet security, CORS, Rate Limiters
-│   ├── server.js                  # Entry point, DB-first lifecycle, graceful shutdown
-│   ├── config/db.js               # Mongoose connection pool manager
-│   ├── models/                    # Url & Click schemas with compound indexes
-│   ├── middleware/                # Auth, RateLimiter, Fire-and-Forget Analytics
-│   ├── controllers/               # Joi-validated CRUD & Aggregation pipelines
-│   └── utils/                     # nanoid CSPRNG, SHA-256 deduplication, QR synthesis
+├── src\
+│   ├── app\
+│   │   ├── layout.tsx                     # Root layout with theme provider & toasts
+│   │   ├── page.tsx                       # Public landing page with live interactive shortener
+│   │   ├── login\
+│   │   │   └── page.tsx                   # User authentication login
+│   │   ├── register\
+│   │   │   └── page.tsx                   # User registration
+│   │   ├── dashboard\
+│   │   │   ├── layout.tsx                 # Dashboard sidebar, mobile nav, user profile
+│   │   │   ├── page.tsx                   # Dashboard overview & summary metrics
+│   │   │   ├── links\
+│   │   │   │   ├── page.tsx               # Link management table, search, filters
+│   │   │   │   └── [id]\
+│   │   │   │       └── page.tsx           # Individual link analytics & QR generator
+│   │   │   ├── analytics\
+│   │   │   │   └── page.tsx               # Deep global analytics dashboard
+│   │   │   └── settings\
+│   │   │       └── page.tsx               # Profile, security & privacy policy
+│   │   ├── r\
+│   │   │   └── [code]\
+│   │   │       └── route.ts               # Short URL 302 redirect engine & event ingest
+│   │   └── api\
+│   │       ├── auth\
+│   │       │   ├── login\route.ts         # User login & JWT cookie emission
+│   │       │   ├── register\route.ts      # User registration & password hashing
+│   │       │   ├── me\route.ts            # Current authenticated session
+│   │       │   └── logout\route.ts        # Clear session cookie
+│   │       ├── links\
+│   │       │   ├── route.ts               # GET all links (paginated) & POST create link
+│   │       │   └── [id]\
+│   │       │       └── route.ts           # GET, PUT (edit), DELETE, PATCH (pause/resume)
+│   │       └── analytics\
+│   │           ├── overview\route.ts      # Aggregated metrics (clicks, trends, devices)
+│   │           └── [id]\route.ts          # Granular link analytics
+│   ├── components\
+│   │   ├── landing\                       # Hero, Features, Analytics preview, Pricing, Footer
+│   │   ├── dashboard\                     # MetricsCards, ClickChart, LinkTable, QRModal, CreateLinkModal
+│   │   └── ui\                            # Button, Input, Modal, Badge, Tooltip, Toast
+│   ├── lib\
+│   │   ├── db.ts                          # SQLite connection & schema migrations
+│   │   ├── auth.ts                        # JWT verification, password hashing, session cookies
+│   │   ├── user-agent.ts                  # Browser, OS, device, bot detection
+│   │   ├── anonymizer.ts                  # Privacy-safe keyed HMAC visitor fingerprinting
+│   │   └── utils.ts                       # Formatters, URL validation, slug generator
+│   └── types\
+│       └── index.ts                       # Complete TypeScript interfaces
+├── public\
+│   └── favicon.ico                        # Branding assets
+├── package.json
+├── tsconfig.json
+├── tailwind.config.ts
+└── next.config.mjs
 ```
 
 ---
 
-## 3. Telemetry Ingestion Architecture (Fire-and-Forget)
+## 3. Data Flow & Security Guarantees
 
-```
-[ Client Request ] -> GET /:code
-         │
-         ├──► 1. Query Url model (Indexed B-Tree by shortCode / customAlias)
-         ├──► 2. Send HTTP 302 Found Response (<3.8ms)
-         │
-         └──► 3. Background Task (Un-awaited Asynchronous Micro-task)
-                  ├── Extract IP from X-Forwarded-For
-                  ├── Hash IP with salt: SHA-256(IP + IP_HASH_SALT)
-                  ├── Resolve Country/City via offline GeoIP binary database
-                  ├── Parse User-Agent (Hardware device, OS, Browser engine)
-                  ├── Insert document into Click collection
-                  └── Atomic update: Url.findByIdAndUpdate(..., { $inc: { clicks: 1 } })
-```
-
----
-
-## 4. Workstation State Management
-
-- **Dynamic Period Filtering:** 7-Day, 30-Day, and 90-Day time windows update all Chart.js instances without full-page reloads.
-- **Search & Sort Pipeline:** Debounced real-time input filtering for the route inventory table with pagination memory.
-- **API Key Persistence:** Header-based session memory enabling seamless sync between Landing and Workstation views.
+1. **Short URL Redirection Speed:** The `/r/[code]` route performs an indexed query on `links WHERE short_code = ?`. If active and non-expired, it dispatches the click telemetry asynchronously and returns an instantaneous HTTP `302 Found` with `Location: <destination>`.
+2. **Visitor Privacy:** No plain IP address is ever stored. A keyed HMAC hash is computed using `SHA256(IP + UserAgent + DailySalt)`, allowing 24-hour unique visitor estimation while ensuring zero reversibility or cross-site tracking.
+3. **Data Isolation:** Every link query and analytics aggregation contains `WHERE user_id = ?` extracted from the cryptographically verified JWT cookie.

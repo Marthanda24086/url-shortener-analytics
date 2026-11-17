@@ -1,28 +1,45 @@
-# Use official Node.js LTS image
-FROM node:20-alpine
+# Production multi-stage Dockerfile for KAIRO
+FROM node:20-alpine AS base
 
-# Set working directory inside container
+# Install dependencies only when needed
+FROM base AS deps
+RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Copy package files first (layer caching — npm install only re-runs if package.json changes)
-COPY package*.json ./
+COPY package.json package-lock.json ./
+RUN npm ci
 
-# Install production dependencies only
-RUN npm ci --only=production
-
-# Copy rest of application
+# Rebuild the source code only when needed
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Don't run as root (security best practice)
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-USER appuser
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
 
-# Expose the port
+RUN npm run build
+
+# Production image, copy all the files and run next
+FROM base AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/scripts ./scripts
+
+USER nextjs
+
 EXPOSE 3000
 
-# Health check — Docker restarts container if this fails
-HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-  CMD wget -qO- http://localhost:3000/api/health || exit 1
-
-# Start the app
-CMD ["node", "server.js"]
+CMD ["npm", "run", "start"]
